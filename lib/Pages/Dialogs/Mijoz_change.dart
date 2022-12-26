@@ -69,12 +69,12 @@ class _Mijoz_changeState extends State<Mijoz_change> {
             ),
             MaterialButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MijozAdd(),
-                  ),
-                );
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => MijozAdd(),
+                //   ),
+                // );
               },
               //since this is only a UI app
               child: Text(

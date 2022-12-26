@@ -14,7 +14,6 @@ class _ReportPageState extends State<ReportPage> {
   String AktSverka = "";
   String DtKtOstatkaKlient = "";
 
-
   @override
   void initState() {
     init();
@@ -25,22 +24,6 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: cWhiteColor,
-      appBar: AppBar(
-        leading: InkResponse(
-          onTap: () => Scaffold.of(context).openDrawer(),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Image.asset(
-              "assets/images/menu_icon.png",
-              color: cFirstColor,
-              height: 30,
-              width: 30,
-            ),
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: cWhiteColor,
-      ),
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -50,6 +33,41 @@ class _ReportPageState extends State<ReportPage> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(
+                height: 30,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 0, right: 0, top: 20, bottom: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkResponse(
+                      onTap: () => Scaffold.of(context).openDrawer(),
+                      child: Image.asset(
+                        "assets/images/menu_icon.png",
+                        color: cFirstColor,
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                    Text(
+                      'Хисоботлар',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: cFirstColor,
+                          fontSize: 22),
+                    ),
+                    SizedBox(
+                      width: 60,
+                    ),
+                  ],
+                ),
+              ),
+              Spacer(),
+
+              /// type 3
               Visibility(
                 child: MaterialButton(
                   onPressed: () {
@@ -58,10 +76,13 @@ class _ReportPageState extends State<ReportPage> {
                       context: context,
                       builder: (BuildContext context) {
                         return XisobotDialog(
-                            title: "Мижоз Акт Сверка",
-                            isClient: turi == "1",
-                            date2: true,
-                            isRegion: false);
+                          title: "Мижоз Акт Сверка",
+                          isClient: turi == "1",
+                          date2: true,
+                          isRegion: false,
+                          queryType: "3",
+                          isSelectClient: turi == "2" ? true : false,
+                        );
                       },
                     );
                   },
@@ -81,14 +102,16 @@ class _ReportPageState extends State<ReportPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
-                visible: AktSverka == "0"||turi=="1",
+                visible: AktSverka == "0" || turi == "1",
               ),
               Visibility(
                 child: SizedBox(
                   height: 15,
                 ),
-                visible: AktSverka == "0"||turi=="1",
+                visible: AktSverka == "0" || turi == "1",
               ),
+
+              ///type 4
               Visibility(
                 child: MaterialButton(
                   onPressed: () {
@@ -97,10 +120,13 @@ class _ReportPageState extends State<ReportPage> {
                       context: context,
                       builder: (BuildContext context) {
                         return XisobotDialog(
-                            title: "Савдо Рейстри",
-                            isClient: turi == "1",
-                            date2: true,
-                            isRegion: false);
+                          title: "Савдо Рейстри",
+                          isClient: turi == "1",
+                          date2: true,
+                          isRegion: false,
+                          queryType: "4",
+                          isSelectClient: false,
+                        );
                       },
                     );
                   },
@@ -120,7 +146,7 @@ class _ReportPageState extends State<ReportPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
-                visible: ReestrRealizatsiya == "0"||turi=="1",
+                visible: ReestrRealizatsiya == "0" || turi == "1",
               ),
               // SizedBox(
               //   height: 15,
@@ -160,8 +186,10 @@ class _ReportPageState extends State<ReportPage> {
                 child: SizedBox(
                   height: 15,
                 ),
-                visible: ReestrRealizatsiya == "0"||turi=="1",
+                visible: ReestrRealizatsiya == "0" || turi == "1",
               ),
+
+              ///type 5
               Visibility(
                 child: MaterialButton(
                   onPressed: () {
@@ -170,10 +198,13 @@ class _ReportPageState extends State<ReportPage> {
                       context: context,
                       builder: (BuildContext context) {
                         return XisobotDialog(
-                            title: "ДТ-КТ қолдиғи",
-                            isClient: turi == "1",
-                            date2: false,
-                            isRegion: true);
+                          title: "ДТ-КТ қолдиғи",
+                          isClient: turi == "1",
+                          date2: false,
+                          queryType: "5",
+                          isRegion: true,
+                          isSelectClient: false,
+                        );
                       },
                     );
                   },
@@ -193,9 +224,9 @@ class _ReportPageState extends State<ReportPage> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
-                visible: DtKtOstatkaKlient == "0"||turi=="1",
+                visible: DtKtOstatkaKlient == "0" || turi == "1",
               ),
-              SizedBox(height: 50,)
+              Spacer(),
             ],
           ),
         ),
@@ -209,5 +240,6 @@ class _ReportPageState extends State<ReportPage> {
     ReestrRealizatsiya = prefs.getString('ReestrRealizatsiya') ?? "";
     AktSverka = prefs.getString('AktSverka') ?? "";
     DtKtOstatkaKlient = prefs.getString('DtKtOstatkaKlient') ?? "";
+    setState(() {});
   }
 }

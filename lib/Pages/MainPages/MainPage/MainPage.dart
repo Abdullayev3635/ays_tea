@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../Canstants/Texts.dart';
 import '../../Login/LoginPage.dart';
+import '../../MilozAdd/ClientLocationChange.dart';
+import '../../MilozAdd/MijozAdd.dart';
 import '../../Payment/ClientPay.dart';
 import '../../Payment/XodimPay.dart';
 import '../../Xisobot/Hisobot_page.dart';
@@ -56,6 +58,10 @@ class _MainPageState extends State<MainPage> {
         return ProfilePage();
       case 2:
         return ReportPage();
+      case 3:
+        return ClientAdd();
+      case 4:
+        return ClientLocationChange();
 
       default:
         return new Text("Error");
@@ -91,21 +97,24 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     if (widget.turi == "2") {
       drawerItem = [
-        DrawerItem("Payment", Icons.payment, IconThemeData(color: cFirstColor)),
-        DrawerItem("Profile", Icons.person, IconThemeData(color: cFirstColor)),
-        DrawerItem(
-            "Report", Icons.report_outlined, IconThemeData(color: cFirstColor)),
+        DrawerItem("Тўлов", Icons.payment, IconThemeData(color: cFirstColor)),
+        DrawerItem("Профиль", Icons.person, IconThemeData(color: cFirstColor)),
+        DrawerItem("Хисобот", Icons.report_outlined,
+            IconThemeData(color: cFirstColor)),
+        DrawerItem("Мижоз қўшиш", Icons.add_task_rounded,
+            IconThemeData(color: cFirstColor)),
       ];
     } else {
       drawerItem = [
         DrawerItem(
-            "Home", Icons.home_outlined, IconThemeData(color: cFirstColor)),
-        DrawerItem("History", Icons.history, IconThemeData(color: cFirstColor)),
-        DrawerItem("Card", Icons.recycling, IconThemeData(color: cFirstColor)),
-        DrawerItem("Profile", Icons.person, IconThemeData(color: cFirstColor)),
+            "Буюртма", Icons.home_outlined, IconThemeData(color: cFirstColor)),
+        DrawerItem("Тарих", Icons.history, IconThemeData(color: cFirstColor)),
         DrawerItem(
-            "Report", Icons.report_outlined, IconThemeData(color: cFirstColor)),
-        DrawerItem("Payment", Icons.payment, IconThemeData(color: cFirstColor)),
+            "Саватча", Icons.recycling, IconThemeData(color: cFirstColor)),
+        DrawerItem("Профиль", Icons.person, IconThemeData(color: cFirstColor)),
+        DrawerItem("Хисобот", Icons.report_outlined,
+            IconThemeData(color: cFirstColor)),
+        DrawerItem("Тўлов", Icons.payment, IconThemeData(color: cFirstColor)),
       ];
     }
     var drawerOptions = <Widget>[];
@@ -143,7 +152,8 @@ class _MainPageState extends State<MainPage> {
                 width: 120,
                 child: ClipOval(
                   child: CachedNetworkImage(
-                    imageUrl: baseUrlImg + userId + "^" + turi + ".png",
+                    imageUrl:
+                        baseUrl + imgClient + userId + "^" + turi + ".png",
                     placeholder: (context, url) => Container(
                       margin: EdgeInsets.all(20),
                       child: SvgPicture.asset(
@@ -162,6 +172,19 @@ class _MainPageState extends State<MainPage> {
             ),
             Column(
               children: drawerOptions,
+            ),
+            ListTile(
+              onTap: () {
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ClientLocationChange();
+                  },
+                );
+              },
+              leading: Icon(Icons.add_location_alt),
+              title: Text("Мижозни ўзгартириш"),
             ),
             ListTile(
               onTap: () => showDialog(

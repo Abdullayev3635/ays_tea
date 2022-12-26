@@ -1,16 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/Pages/Login/LoginPage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../Canstants/Texts.dart';
 import '../MainPages/MainPage/MainPage.dart';
 
@@ -46,10 +41,10 @@ class _SplashState extends State<Splash> {
     // loadLocation();
   }
 
-  loadLocation() async {
-    var position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-  }
+  // loadLocation() async {
+  //   var position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high);
+  // }
 
   void stopService() async {
     FlutterBackgroundService().sendData({"action": "stopService"});
@@ -59,13 +54,13 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: cBackColor,
+        color: cWhiteColor,
         child: Center(
           child: Container(
-            width: 170,
-            height: 150,
-            child: SvgPicture.asset(
-              'assets/icons/logoMain.svg',
+            width: 250,
+            height: 250,
+            child: Image.asset(
+              'assets/images/main_icon.png',
             ),
           ),
         ),

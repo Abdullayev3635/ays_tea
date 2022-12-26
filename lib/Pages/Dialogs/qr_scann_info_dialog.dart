@@ -1,6 +1,12 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '../../Canstants/Texts.dart';
 
 class QrScannerInfoDialog extends StatefulWidget {
   const QrScannerInfoDialog({required this.params});
@@ -13,12 +19,14 @@ class QrScannerInfoDialog extends StatefulWidget {
 
 class _QrScannerInfoDialogState extends State<QrScannerInfoDialog> {
   var dataSp;
+  String userId = "";
+  bool loading = false;
 
   @override
   void initState() {
     print(widget.params);
     dataSp = widget.params.split(':');
-    print(dataSp.toString());
+    loadInfo();
     super.initState();
   }
 
@@ -71,7 +79,6 @@ class _QrScannerInfoDialogState extends State<QrScannerInfoDialog> {
             SizedBox(
               height: 25,
             ),
-
             Row(
               children: [
                 Text(
@@ -141,25 +148,25 @@ class _QrScannerInfoDialogState extends State<QrScannerInfoDialog> {
             ),
             MaterialButton(
               onPressed: () {
-                Navigator.pop(context);
+                inZakaz();
               },
-              child: Text(
-                'Жўнатиш',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'SFUIDisplay',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
+              child: loading
+                  ? CupertinoActivityIndicator(
+                      color: cWhiteColor,
+                    )
+                  : Text(
+                      'Жўнатиш',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'SFUIDisplay',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
               color: cFirstColor,
               elevation: 0,
               minWidth: 300,
               height: 55,
               textColor: Colors.white,
-
-              /// --------------------------------------
-              /// changing border shape of material button.
-              /// --------------------------------------
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),
@@ -167,5 +174,59 @@ class _QrScannerInfoDialogState extends State<QrScannerInfoDialog> {
         ),
       ),
     );
+  }
+
+  Future<void> inZakaz() async {
+    loading = true;
+    setState(() {});
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 6000,
+      receiveTimeout: 3000,
+    );
+    Dio dio = new Dio(options);
+
+    var formData = FormData.fromMap({
+      "agent_id": userId,
+      'mijoz_id': dataSp[0],
+      'summa': dataSp[2],
+      'izox': dataSp[3],
+    });
+
+
+    Response response = await dio.post(
+      "${baseUrl}in_tolov.php",
+      data: formData,
+      options: Options(
+        receiveTimeout: 30000,
+        sendTimeout: 30000,
+      ),
+    );
+    if (response.statusCode == 200) {
+      loading = false;
+      setState(() {});
+      Navigator.pop(context);
+    } else {
+      loading = false;
+      setState(() {});
+      _showToast(context, "Малумотлар нотўгри");
+    }
+  }
+
+  void _showToast(BuildContext context, String text) {
+    Fluttertoast.showToast(
+      msg: text,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black45,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
+  void loadInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('agent_id') ?? "0";
+    print(userId);
   }
 }

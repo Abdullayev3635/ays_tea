@@ -1,9 +1,8 @@
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
-import 'package:zilol_ays_tea/Pages/MapForAgent/MapForAgent.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart';
 
 import 'SelectDialogClient.dart';
 
@@ -18,7 +17,7 @@ class _Mijoz_joylashuvini_korishState extends State<Mijoz_joylashuvini_korish> {
   String client_name = "Мижозни танланг";
   String client_id = "";
   bool loadingSave = false;
-  late Position position;
+
   bool loadinggetLoacation = false;
   late double latitude;
   late double longitude;
@@ -31,18 +30,18 @@ class _Mijoz_joylashuvini_korishState extends State<Mijoz_joylashuvini_korish> {
     strokeWidth: 3,
   ));
 
-  loadLocation() async {
-    loadinggetLoacation = true;
-    setState(() {});
-    position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    loadinggetLoacation = false;
-    setState(() {});
-  }
+  // loadLocation() async {
+  //   loadinggetLoacation = true;
+  //   setState(() {});
+  //   position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high);
+  //   loadinggetLoacation = false;
+  //   setState(() {});
+  // }
 
   @override
   void initState() {
-    loadLocation();
+
     super.initState();
   }
 
@@ -151,16 +150,16 @@ class _Mijoz_joylashuvini_korishState extends State<Mijoz_joylashuvini_korish> {
                     if (client_id == "") {
                       _showToast(context, "Илтимос мижоз танланг");
                     } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MapForAgent(
-                            lat: lat,
-                            lng: lng,
-                            name: client_name,
-                          ),
-                        ),
-                      );
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => MapForAgent(
+                      //       lat: lat,
+                      //       lng: lng,
+                      //       name: client_name,
+                      //     ),
+                      //   ),
+                      // );
+                      // Navigator.push(
                     }
                   },
                   child: Container(

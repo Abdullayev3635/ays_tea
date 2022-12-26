@@ -168,22 +168,13 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      height: 10,
-                    ),
                     Container(
                       width: 200,
-                      height: 100,
-                      child: SvgPicture.asset(
-                        'assets/icons/logoMain.svg',
+                      height: 150,
+                      child: Image.asset(
+                        'assets/images/main_icon.png',
                       ),
                     ),
-                    SizedBox(
-                      height: 35,
-                    ),
-                    /*
-
-                     */
                     Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),

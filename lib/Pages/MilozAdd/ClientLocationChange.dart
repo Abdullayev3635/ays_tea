@@ -1,33 +1,39 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'dart:io';
 import 'package:getwidget/components/loader/gf_loader.dart';
 import 'package:getwidget/types/gf_loader_type.dart';
 
 import '../../Canstants/Widgets/PopupMenu.dart';
-import 'NotInternetDialog.dart';
-import 'SelectDialogClient.dart';
+import '../Dialogs/NotInternetDialog.dart';
+import '../Dialogs/SelectDialogClient.dart';
+import 'MapAndChange.dart';
 
-class Mijoz_ozgartirish extends StatefulWidget {
+class ClientLocationChange extends StatefulWidget {
   @override
-  _Mijoz_ozgartirishState createState() => _Mijoz_ozgartirishState();
+  _ClientLocationChangeState createState() => _ClientLocationChangeState();
 }
 
-class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
+class _ClientLocationChangeState extends State<ClientLocationChange> {
   TextEditingController summa = TextEditingController();
   String client_name = "Мижозни танланг";
   String client_id = "0";
   bool loadingSave = false;
-  // late Position position;
+  Position? position;
   String addresName = 'Локация ўзгартириш';
   bool loadinggetLoacation = false;
   late double latitude;
   late double longitude;
+  File? image;
 
   late Widget widgetSave = Center(
       child: CircularProgressIndicator(
@@ -38,10 +44,30 @@ class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
   loadLocation() async {
     loadinggetLoacation = true;
     setState(() {});
-    // position = await Geolocator.getCurrentPosition(
-    //     desiredAccuracy: LocationAccuracy.high);
+    position = await _determinePosition();
     loadinggetLoacation = false;
     setState(() {});
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition();
   }
 
   @override
@@ -114,6 +140,66 @@ class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
                       SizedBox(
                         height: 25,
                       ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            height: 120,
+                            width: 120,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              child: SizedBox(
+                                width: 120,
+                                height: 120,
+                                child: ClipOval(
+                                  child: this.image == null
+                                      ? CachedNetworkImage(
+                                          imageUrl: baseUrl +
+                                              imgClient +
+                                              client_id +
+                                              ".png",
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            margin: EdgeInsets.all(20),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/placeholder.svg',
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Image.asset(
+                                            "assets/images/person_png.png",
+                                            height: 120,
+                                            width: 120,
+                                          ),
+                                          fit: BoxFit.fill,
+                                        )
+                                      : ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          child: Image.file(
+                                            this.image!,
+                                            fit: BoxFit.fill,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            child: InkWell(
+                              onTap: () {
+                                pickImage();
+                              },
+                              child: SvgPicture.asset("assets/icons/plus.svg"),
+                            ),
+                            bottom: 2,
+                            right: 2,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 25,
+                      ),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 15),
                         width: MediaQuery.of(context).size.width,
@@ -132,8 +218,8 @@ class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
                               },
                             ).then((value) {
                               setState(() {
-                                client_name = value['client_nomi'];
-                                client_id = value['id'];
+                                client_name = value['mijoz_nomi'];
+                                client_id = value['mijoz_id'];
                               });
                             });
                           },
@@ -160,20 +246,20 @@ class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
                       ),
                       InkResponse(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => MapAndChange(
-                          //       position: position,
-                          //     ),
-                          //   ),
-                          // ).then((value) {
-                          //   setState(() {
-                          //     latitude = value['lat'];
-                          //     longitude = value['lng'];
-                          //     addresName = value['address'];
-                          //   });
-                          // });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapChange(
+                                position: position!,
+                              ),
+                            ),
+                          ).then((value) {
+                            setState(() {
+                              latitude = value['lat'];
+                              longitude = value['lng'];
+                              addresName = value['address'];
+                            });
+                          });
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 15),
@@ -211,7 +297,7 @@ class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
                       MaterialButton(
                         onPressed: () {
                           check().then((intenet) async {
-                            if (intenet != null && intenet) {
+                            if (intenet) {
                               changeClient();
                             } else if (!intenet) {
                               showDialog(
@@ -253,6 +339,42 @@ class _Mijoz_ozgartirishState extends State<Mijoz_ozgartirish> {
         ),
       ),
     );
+  }
+
+  Future pickImage() async {
+    try {
+      final image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, maxHeight: 512, maxWidth: 512);
+      if (image == null) return;
+      final imageTemp = File(image.path);
+      saveImage();
+      setState(() => this.image = imageTemp);
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  void saveImage() async {
+    if (image != null) {
+      List<int> imageBytes = image!.readAsBytesSync();
+      String base64Image = base64Encode(imageBytes);
+      final Dio dio = Dio();
+      var formData = FormData.fromMap({
+        "id": client_id + "^" + "1",
+        "rasm": base64Image,
+      });
+      final response = await dio.post(
+        baseUrl + "in_mijoz_rasm.php",
+        data: formData,
+        options: Options(
+          receiveTimeout: 30000,
+          sendTimeout: 30000,
+        ),
+      );
+      if (response.statusCode == 200) {
+        print("success");
+      }
+    }
   }
 
   changeClient() async {

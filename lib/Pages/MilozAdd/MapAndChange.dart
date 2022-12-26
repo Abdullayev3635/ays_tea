@@ -1,23 +1,22 @@
-import 'package:zilol_ays_tea/Canstants/color_const.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../Canstants/color_const.dart';
 
-class MapAndChange extends StatefulWidget {
-  late Position position;
+class MapChange extends StatefulWidget {
+  final Position position;
 
-  MapAndChange({required this.position}) : super();
+  MapChange({required this.position}) : super();
 
   @override
-  _MapAndChangeState createState() => _MapAndChangeState();
+  _MapChangeState createState() => _MapChangeState();
 }
 
-class _MapAndChangeState extends State<MapAndChange> {
+class _MapChangeState extends State<MapChange> {
   // static const LatLng _center = const LatLng(45.3998323, 55.7865946);
 
   Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
@@ -61,7 +60,8 @@ class _MapAndChangeState extends State<MapAndChange> {
         // setState(() {
         _markers[markerId] = updatedMarker;
         // });
-        _fetchLocationForY(_lastMapPosition.latitude, _lastMapPosition.longitude);
+        _fetchLocationForY(
+            _lastMapPosition.latitude, _lastMapPosition.longitude);
       }
     });
   }
@@ -78,19 +78,6 @@ class _MapAndChangeState extends State<MapAndChange> {
                   CameraPosition(target: _lastMapPosition, zoom: 15.0),
               onMapCreated: _onMapCreated,
               zoomControlsEnabled: false,
-              // onCameraMove: (CameraPosition position) {
-              //   if (_markers.length > 0) {
-              //     MarkerId markerId = MarkerId(_markerIdVal());
-              //     Marker marker = _markers[markerId]!;
-              //     Marker updatedMarker = marker.copyWith(
-              //       positionParam: position.target,
-              //     );
-              //     setState(() {
-              //       _markers[markerId] = updatedMarker;
-              //     });
-              //     // getAddressName(position.target.latitude, position.target.longitude);
-              //   }
-              // },
               onTap: (camera) {
                 if (_markers.length > 0) {
                   MarkerId markerId = MarkerId(_markerIdVal());
@@ -99,7 +86,7 @@ class _MapAndChangeState extends State<MapAndChange> {
                     positionParam: camera,
                   );
                   setState(() {
-                  _markers[markerId] = updatedMarker;
+                    _markers[markerId] = updatedMarker;
                   });
 
                   _fetchLocationForY(camera.latitude, camera.longitude);

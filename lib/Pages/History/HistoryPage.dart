@@ -68,7 +68,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                   ),
                   Text(
-                    'Тарих',
+                    'Буюртмалар тарихи',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontWeight: FontWeight.w400,

@@ -113,8 +113,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: ClipOval(
                           child: this.image == null
                               ? CachedNetworkImage(
-                                  imageUrl:
-                                      baseUrlImg + userId + "^" + turi + ".png",
+                                  imageUrl: baseUrl +
+                                      imgClient +
+                                      userId +
+                                      "^" +
+                                      turi +
+                                      ".png",
                                   placeholder: (context, url) => Container(
                                     margin: EdgeInsets.all(20),
                                     child: SvgPicture.asset(

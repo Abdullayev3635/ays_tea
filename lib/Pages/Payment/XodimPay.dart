@@ -22,6 +22,11 @@ class XodimPay extends StatefulWidget {
   _XodimPayState createState() => _XodimPayState();
 }
 
+enum ButtonAction {
+  cancel,
+  agree,
+}
+
 class _XodimPayState extends State<XodimPay> {
   TextEditingController summasum = TextEditingController();
 
@@ -45,7 +50,7 @@ class _XodimPayState extends State<XodimPay> {
 
   late Widget widgetQarz = Center(
     child: CupertinoActivityIndicator(
-      color: cWhiteColor,
+      color: cFirstColor,
     ),
   );
   late Widget widgetSave = Center(
@@ -63,19 +68,63 @@ class _XodimPayState extends State<XodimPay> {
 
   void loadInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    agent_id = prefs.getString('Id') ?? "";
+    agent_id = prefs.getString('agent_id') ?? "";
     canPay = prefs.getString('can_tolov') ?? "";
     payConfirm = prefs.getString('tolovTasdiq') ?? "";
     setState(() {});
   }
 
-  void inPay() {
-    Navigator.pop(context);
+  Future<void> inPay() async {
+    loadingSave = true;
+    setState(() {});
+    BaseOptions options = new BaseOptions(
+      connectTimeout: 6000,
+      receiveTimeout: 3000,
+    );
+    Dio dio = new Dio(options);
+
+    var formData = FormData.fromMap({
+      "agent_id": agent_id,
+      'mijoz_id': clientId,
+      'summa': summasum.text.replaceAll(",", ""),
+      'izox': izoh.text,
+    });
+
+    Response response = await dio.post(
+      "${baseUrl}in_tolov.php",
+      data: formData,
+      options: Options(
+        receiveTimeout: 30000,
+        sendTimeout: 30000,
+      ),
+    );
+    if (response.statusCode == 200) {
+      client_name = "Мижозни танланг";
+      clientId = "";
+      agent_id = "";
+      summasum.text = "";
+      izoh.text = "";
+      qarzi_som = 0;
+      loadingSave = false;
+      setState(() {});
+    } else {
+      loadingSave = false;
+      setState(() {});
+      _showToast(context, "Малумотлар нотўгри");
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void showMaterialDialog<T>(
+      {required BuildContext context, required Widget child}) {
+    showDialog<T>(
+      context: context,
+      builder: (BuildContext context) => child,
+    );
   }
 
   @override
@@ -269,7 +318,32 @@ class _XodimPayState extends State<XodimPay> {
                         _showToast(
                             context, "Сизнинг тўлов қилишга ҳуқуқингиз йўқ");
                       } else {
-                        inPay();
+                        showMaterialDialog<ButtonAction>(
+                          context: context,
+                          child: AlertDialog(
+                            title: const Text('Тўлов!'),
+                            content: Text(
+                              'Тўловни амалга оширишни хохлайсизми ?',
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Йўқ'),
+                                onPressed: () {
+                                  Navigator.pop(context, ButtonAction.cancel);
+                                  FocusScope.of(context).requestFocus(FocusNode());
+                                },
+                              ),
+                              TextButton(
+                                child: const Text('Ҳа'),
+                                onPressed: () {
+                                  inPay();
+                                  Navigator.pop(context, ButtonAction.cancel);
+                                  FocusScope.of(context).requestFocus(FocusNode());
+                                },
+                              ),
+                            ],
+                          ),
+                        );
                       }
                     },
                     child: loadingSave
@@ -343,6 +417,7 @@ class _XodimPayState extends State<XodimPay> {
   }
 
   void getHistory() async {
+    count = 1;
     loadingQarz = true;
     setState(() {});
     final Dio dio = Dio();
@@ -365,27 +440,36 @@ class _XodimPayState extends State<XodimPay> {
     }
   }
 
+  int count = 0;
+
   void lastQuery(final lastId) async {
-    final formData2 =
-        FormData.fromMap({"user_id": agent_id, "sorov_id": lastId});
-    final response2 = await Dio().post(
-      baseUrl + "get_javob.php",
-      data: formData2,
-      options: Options(
-        receiveTimeout: 30000,
-        sendTimeout: 30000,
-      ),
-    );
-    if (response2.statusCode == 200) {
-      if (response2.data != "" && response2.data != "no") {
-        qarzi_som = double.tryParse(response2.data.toString()) ?? 0;
-        loadingQarz = false;
-        setState(() {});
-      } else {
-        await Future.delayed(const Duration(milliseconds: 500));
-        lastQuery(lastId);
-        print(lastId);
+    if (count < 30) {
+      final formData2 =
+          FormData.fromMap({"user_id": agent_id, "sorov_id": lastId});
+      final response2 = await Dio().post(
+        baseUrl + "get_javob.php",
+        data: formData2,
+        options: Options(
+          receiveTimeout: 30000,
+          sendTimeout: 30000,
+        ),
+      );
+      if (response2.statusCode == 200) {
+        if (response2.data != "" && response2.data != "no") {
+          qarzi_som = double.tryParse(response2.data.toString()) ?? 0;
+          loadingQarz = false;
+          setState(() {});
+        } else {
+          count += 1;
+          await Future.delayed(const Duration(milliseconds: 500));
+          lastQuery(lastId);
+          print("last Id:" + lastId + "count:" + count.toString());
+        }
       }
+    } else {
+      _showToast(context, "Малумотни юклашда хатолик бўлди");
+      loadingQarz = false;
+      setState(() {});
     }
   }
 

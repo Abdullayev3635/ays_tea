@@ -1,16 +1,12 @@
-import 'dart:convert';
-
+import 'package:geolocator/geolocator.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/Pages/Login/LoginPage.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,9 +39,11 @@ class _RegistPageState extends State<RegistPage> {
 
   late double latitude;
   late double longitude;
-  late Position position;
+
+  // late Position position;
   String regionName = "Ҳудудни танланг";
   String regionId = "";
+  Position? position;
 
   String urlPath1 = "";
   var maskFormatter = new MaskTextInputFormatter(
@@ -78,6 +76,32 @@ class _RegistPageState extends State<RegistPage> {
   @override
   void initState() {
     super.initState();
+    loadLocation();
+  }
+
+  void loadLocation() async {
+    position = await _determinePosition();
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+    return await Geolocator.getCurrentPosition();
   }
 
   @override
@@ -86,6 +110,10 @@ class _RegistPageState extends State<RegistPage> {
       body: InkWell(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
+          print("lat: " +
+              position!.latitude.toString() +
+              " long: " +
+              position!.longitude.toString());
         },
         child: Container(
           padding: EdgeInsets.all(30),
@@ -98,46 +126,17 @@ class _RegistPageState extends State<RegistPage> {
               SizedBox(
                 height: 10,
               ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
+              Container(
+                height: 120,
+                width: 120,
+                child: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  child: Image.asset(
+                    "assets/images/person_png.png",
                     height: 120,
                     width: 120,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      child: SizedBox(
-                        width: 120,
-                        height: 120,
-                        child: ClipOval(
-                          child: this.image == null
-                              ? Image.asset(
-                                  "assets/images/person_png.png",
-                                  height: 120,
-                                  width: 120,
-                                )
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: Image.file(
-                                    this.image!,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ),
                   ),
-                  Positioned(
-                    child: InkWell(
-                      onTap: () {
-                        pickImage();
-                      },
-                      child: SvgPicture.asset("assets/icons/plus.svg"),
-                    ),
-                    bottom: 2,
-                    right: 2,
-                  ),
-                ],
+                ),
               ),
               SizedBox(
                 height: 25,
@@ -507,47 +506,6 @@ class _RegistPageState extends State<RegistPage> {
     }
   }
 
-  Future pickImage() async {
-    try {
-      final image = await ImagePicker().pickImage(
-          source: ImageSource.camera, maxHeight: 1024, maxWidth: 1024);
-      if (image == null) return;
-      final imageTemp = File(image.path);
-      setState(() => this.image = imageTemp);
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
-  }
-
-  void uploadImage() async {
-    BaseOptions options = new BaseOptions(
-      baseUrl: baseUrl + "set_image.php",
-      connectTimeout: 600000,
-      receiveTimeout: 600000,
-    );
-    Dio dio = new Dio(options);
-    String fileName;
-    FormData formData;
-    Response response;
-
-    try {
-      if (image != null) {
-        fileName = image!.path.split('/').last;
-        formData = FormData.fromMap({
-          "image":
-              await MultipartFile.fromFile(image!.path, filename: fileName),
-        });
-        response = await dio.post(baseUrl + "set_image.php", data: formData);
-
-        if (response.statusCode == 200) {
-          urlPath1 = response.data;
-        }
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   void inRegister() async {
     loading = true;
     setState(() {});
@@ -560,7 +518,12 @@ class _RegistPageState extends State<RegistPage> {
         "~" +
         regionId +
         "~" +
-        pass.text;
+        pass.text +
+        "~" +
+        position!.latitude.toString() +
+        "~" +
+        position!.longitude.toString();
+
     var formData = FormData.fromMap({
       "user_id": "1",
       "sorov_turi": "1",
@@ -603,18 +566,17 @@ class _RegistPageState extends State<RegistPage> {
               'telefon', "+998" + maskFormatter.getUnmaskedText().toString());
           await prefs.setString('parol', pass.text);
           await prefs.setString('turi', "1");
+          Navigator.pushReplacement(
+            context,
+            new MaterialPageRoute(
+              builder: (BuildContext context) => new MainPage("1"),
+            ),
+          );
         } else {
           _showToast(context, "Регистрация қилишда хатолик!");
         }
         loading = false;
         setState(() {});
-        saveImage(lastId);
-        Navigator.pushReplacement(
-          context,
-          new MaterialPageRoute(
-            builder: (BuildContext context) => new MainPage("1"),
-          ),
-        );
       } else {
         if (count < 60) {
           await Future.delayed(const Duration(milliseconds: 500));
@@ -625,30 +587,6 @@ class _RegistPageState extends State<RegistPage> {
           loading = false;
           setState(() {});
         }
-      }
-    }
-  }
-
-  void saveImage(String lastId) async {
-    if (image != null) {
-      List<int> imageBytes = image!.readAsBytesSync();
-      print(imageBytes);
-      String base64Image = base64Encode(imageBytes);
-      final Dio dio = Dio();
-      var formData = FormData.fromMap({
-        "id": lastId+"^"+"1",
-        "rasm": base64Image,
-      });
-      final response1 = await dio.post(
-        baseUrl + "in_mijoz_rasm.php",
-        data: formData,
-        options: Options(
-          receiveTimeout: 30000,
-          sendTimeout: 30000,
-        ),
-      );
-      if (response1.statusCode == 200) {
-        print("seccess");
       }
     }
   }

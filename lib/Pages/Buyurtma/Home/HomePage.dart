@@ -10,7 +10,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,6 +45,7 @@ class _HomePageState extends State<HomePage> {
       child: CupertinoActivityIndicator(
     color: cFirstColor,
   ));
+
   late Widget widgetBrend = Center(
       child: CupertinoActivityIndicator(
     color: cFirstColor,
@@ -120,7 +120,9 @@ class _HomePageState extends State<HomePage> {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child:SizedBox(height: 30,),
+            child: SizedBox(
+              height: 30,
+            ),
           ),
           SliverAppBar(
             automaticallyImplyLeading: false,
@@ -168,13 +170,14 @@ class _HomePageState extends State<HomePage> {
                                 filterSearchResults(text);
                               },
                               onTap: () {
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   new MaterialPageRoute(
                                     builder: (context) => Product(
                                       brendList: BrendModel(
                                         id: "",
                                         nomi: "Барча товарлар",
+                                        count: "1",
                                         img: "",
                                       ),
                                     ),
@@ -198,8 +201,8 @@ class _HomePageState extends State<HomePage> {
                                     top: 5 // HERE THE IMPORTANT PART
                                     ),
                                 prefixIcon: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      2.0, 0, 6.0, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(2.0, 0, 6.0, 0),
                                   child: SvgPicture.asset(
                                     'assets/icons/search.svg',
                                   ),
@@ -234,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            collapsedHeight: MediaQuery.of(context).size.height / 8,
+            collapsedHeight: MediaQuery.of(context).size.height / 10,
             expandedHeight: 0,
           ),
           loadingBrend
@@ -276,15 +279,13 @@ class _HomePageState extends State<HomePage> {
                                         height: 250,
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.only(
-                                                topLeft:
-                                                    Radius.circular(17.0),
+                                                topLeft: Radius.circular(17.0),
                                                 topRight:
                                                     Radius.circular(17.0))),
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.only(
                                               topLeft: Radius.circular(17.0),
-                                              topRight:
-                                                  Radius.circular(17.0)),
+                                              topRight: Radius.circular(17.0)),
                                           // child: Container(
                                           //   margin: EdgeInsets.all(35),
                                           //   child: SvgPicture.asset(
@@ -292,9 +293,9 @@ class _HomePageState extends State<HomePage> {
                                           //   ),
                                           // ),
                                           child: CachedNetworkImage(
-                                            imageUrl: baseUrlImg +
-                                                (brendList[index].img)
-                                                    .replaceFirst('.', ''),
+                                            imageUrl: baseUrl + imgBrand +
+                                                brendList[index].id +
+                                                ".png",
                                             placeholder: (context, url) =>
                                                 Container(
                                               margin: EdgeInsets.all(20),
@@ -330,8 +331,7 @@ class _HomePageState extends State<HomePage> {
                                         child: Text(
                                           brendList[index].nomi,
                                           style: TextStyle(
-                                              color: cFirstColor,
-                                              fontSize: 16),
+                                              color: cFirstColor, fontSize: 16),
                                           textAlign: TextAlign.center,
                                           maxLines: 2,
                                         ),
@@ -351,11 +351,12 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.indigo[100]),
                                   child: Center(
                                     child: Text(
-                                      "0",
+                                      brendList[index].count == ""
+                                          ? "0"
+                                          : brendList[index].count,
                                       maxLines: 1,
                                       style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.black87),
+                                          fontSize: 12, color: Colors.black87),
                                     ),
                                   ),
                                 ),

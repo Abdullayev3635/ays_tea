@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,13 +17,17 @@ class XisobotDialog extends StatefulWidget {
       required this.title,
       required this.isClient,
       required this.date2,
-      required this.isRegion})
+      required this.queryType,
+      required this.isRegion,
+      required this.isSelectClient})
       : super(key: key);
 
   final title;
   final isClient;
   final date2;
   final isRegion;
+  final queryType;
+  final isSelectClient;
 
   @override
   _XisobotDialogState createState() => _XisobotDialogState();
@@ -36,12 +41,26 @@ class _XisobotDialogState extends State<XisobotDialog> {
   String clientName = "Мижозни танланг";
   String regionName = "Ҳудудни танланг";
   String clientId = "";
+  String agentId = "";
   String regionId = "";
+  String turi = "";
   bool loadingSave = false;
   late Widget widgetSave = Center(
       child: CupertinoActivityIndicator(
     color: cWhiteColor,
   ));
+
+  @override
+  void initState() {
+    loadInfo();
+    super.initState();
+  }
+
+  void loadInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    agentId = prefs.getString('agent_id') ?? "0";
+    turi = prefs.getString('turi') ?? "0";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +281,11 @@ class _XisobotDialogState extends State<XisobotDialog> {
             ),
             MaterialButton(
               onPressed: () {
-                getHistory();
+                if (widget.isSelectClient && clientId == "") {
+                  _showToast(context, "Илтимос мижоз танланг!");
+                } else {
+                  getHistory();
+                }
               },
               child: loadingSave
                   ? Container(
@@ -296,14 +319,23 @@ class _XisobotDialogState extends State<XisobotDialog> {
     );
   }
 
+  int count = 0;
+
   void getHistory() async {
+    count = 1;
     loadingSave = true;
     setState(() {});
     final Dio dio = Dio();
     var formData = FormData.fromMap({
-      "user_id": clientId,
-      "sorov_turi": "1",
-      "sorov_izox": "mijoz_qarzi",
+      "user_id": agentId,
+      "sorov_turi": widget.queryType,
+      "sorov_izox": customFormat.format(selectedDatebosh!).toString() +
+          "~" +
+          customFormat.format(selectedDateoxir!).toString() +
+          "~" +
+          clientId +
+          "~" +
+          regionId,
     });
     final response1 = await dio.post(
       baseUrl + "insert_savol.php",
@@ -320,32 +352,42 @@ class _XisobotDialogState extends State<XisobotDialog> {
   }
 
   void lastQuery(final lastId) async {
-    final formData2 =
-        FormData.fromMap({"user_id": clientId, "sorov_id": lastId});
-    final response2 = await Dio().post(
-      baseUrl + "get_javob.php",
-      data: formData2,
-      options: Options(
-        receiveTimeout: 30000,
-        sendTimeout: 30000,
-      ),
-    );
-    if (response2.statusCode == 200) {
-      if (response2.data != "" && response2.data != "no") {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Webview(html: response2.data.toString()),
-          ),
-        );
-        _showToast(context, "Success");
-        loadingSave = false;
-        setState(() {});
-      } else {
-        await Future.delayed(const Duration(milliseconds: 500));
-        lastQuery(lastId);
-        print(lastId);
+    if (count < 60) {
+      final formData2 = FormData.fromMap({
+        "user_id": agentId,
+        "sorov_id": lastId,
+      });
+      final response2 = await Dio().post(
+        baseUrl + "get_javob.php",
+        data: formData2,
+        options: Options(
+          receiveTimeout: 30000,
+          sendTimeout: 30000,
+        ),
+      );
+      if (response2.statusCode == 200) {
+        if (response2.data != "" && response2.data != "no") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Webview(html: response2.data.toString()),
+            ),
+          ).then((value) => {Navigator.pop(context)});
+
+          _showToast(context, "Success");
+          loadingSave = false;
+          setState(() {});
+        } else {
+          count += 1;
+          await Future.delayed(const Duration(milliseconds: 500));
+          lastQuery(lastId);
+          print(lastId);
+        }
       }
+    } else {
+      _showToast(context, "Сервер билан боғланишда хатолик бўлди");
+      loadingSave = false;
+      setState(() {});
     }
   }
 

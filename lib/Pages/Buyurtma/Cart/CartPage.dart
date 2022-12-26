@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/LocalStorage/Db_Halper.dart';
@@ -35,7 +36,7 @@ class _CartPageState extends State<CartPage> {
 
   String qarzi_som = "0";
   bool loadingQarz = false;
-
+  final format = new NumberFormat("#,##0", "en_US");
   String summa_som = "0.0";
 
   late Widget widgetQarz = Center(
@@ -108,7 +109,7 @@ class _CartPageState extends State<CartPage> {
           overlayWidget: Center(
             child: GFLoader(
               type: GFLoaderType.ios,
-              size: MediaQuery.of(context).size.width / 4,
+              size: MediaQuery.of(context).size.width / 10,
             ),
           ),
           child: Column(
@@ -215,9 +216,10 @@ class _CartPageState extends State<CartPage> {
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                             child: CachedNetworkImage(
-                                              imageUrl: baseUrlImg +
-                                                  (cartList[index].rasmi)
-                                                      .replaceFirst('.', ''),
+                                              imageUrl: baseUrl +
+                                                  imgTovar +
+                                                  (cartList[index].tovarId) +
+                                                  ".png",
                                               placeholder: (context, url) =>
                                                   Container(
                                                 margin: EdgeInsets.all(32),
@@ -370,22 +372,12 @@ class _CartPageState extends State<CartPage> {
                                                     child: SvgPicture.asset(
                                                         'assets/icons/plus.svg'),
                                                     onTap: () {
-                                                      if (double.tryParse(
+                                                      count = (double.parse(
                                                               cartList[index]
-                                                                  .qoldiq)! >
-                                                          double.parse(cartList[
-                                                                  index]
-                                                              .miqdorSoni)) {
-                                                        count = (double.parse(
-                                                                cartList[index]
-                                                                    .miqdorSoni) +
-                                                            1);
-                                                        upSaveToCart(
-                                                            cartList[index]);
-                                                      } else {
-                                                        _showToast(context,
-                                                            "Махсулот қолдиғи етарли эмас");
-                                                      }
+                                                                  .miqdorSoni) +
+                                                          1);
+                                                      upSaveToCart(
+                                                          cartList[index]);
                                                     },
                                                   ),
                                                 ],
@@ -431,7 +423,7 @@ class _CartPageState extends State<CartPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Жами сўм:"),
-                Text(summa_som + " сўм"),
+                Text(format.format(double.tryParse(summa_som)) + " сўм"),
               ],
             ),
           ),
@@ -517,7 +509,7 @@ class _CartPageState extends State<CartPage> {
     context.loaderOverlay.show(
         widget: GFLoader(
       type: GFLoaderType.ios,
-      size: MediaQuery.of(context).size.width / 4,
+      size: MediaQuery.of(context).size.width / 10,
     ));
     BaseOptions options = new BaseOptions(
       connectTimeout: 6000,
@@ -573,7 +565,9 @@ class _CartPageState extends State<CartPage> {
   String getNarx(int index) {
     String narx = "";
 
-    narx = cartList[index].nalichNarxi + " сўм";
+    narx =
+        format.format(double.tryParse(cartList[index].nalichNarxi)).toString() +
+            " сўм";
 
     return narx;
   }
@@ -587,7 +581,7 @@ class _CartPageState extends State<CartPage> {
                   double.parse(element.miqdorSoni))
               .toString());
     });
-    summa_som = jamiSom.toStringAsFixed(2);
+    summa_som = jamiSom.toString();
     setState(() {});
   }
 }

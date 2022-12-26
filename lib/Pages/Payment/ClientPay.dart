@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/Widgets/PopupMenu.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
@@ -26,6 +24,7 @@ class _ClientPayState extends State<ClientPay> {
 
   TextEditingController izoh = TextEditingController();
   String clientId = "";
+  String clientName = "";
   String qarzi_som_text = 'Қарзи сўм:';
 
   final _locale = 'en';
@@ -52,6 +51,7 @@ class _ClientPayState extends State<ClientPay> {
 
   void loadInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    clientName = prefs.getString('fio') ?? "";
     clientId = prefs.getString('mijoz_id') ?? "";
     setState(() {});
   }
@@ -221,13 +221,17 @@ class _ClientPayState extends State<ClientPay> {
             ),
             Spacer(),
             MaterialButton(
-              onPressed: () {
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                clientName = prefs.getString('fio') ?? "";
+                clientId = prefs.getString('mijoz_id') ?? "";
+                print(clientId);
                 if (summasum.text != "") {
                   String st = clientId.toString() +
                       ":" +
-                      "Abdullayev Olloyor" +
+                      clientName +
                       ":" +
-                      summasum.text.toString() +
+                      summasum.text.toString().replaceAll(",", "") +
                       ":" +
                       izoh.text.toString() +
                       ":" +

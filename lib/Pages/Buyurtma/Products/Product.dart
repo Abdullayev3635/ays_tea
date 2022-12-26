@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/Models/BrendModel.dart';
@@ -30,6 +31,7 @@ class _ProductState extends State<Product> {
       child: CupertinoActivityIndicator(
     color: cFirstColor,
   ));
+  final format = new NumberFormat("#,##0", "en_US");
 
   @override
   void initState() {
@@ -68,263 +70,268 @@ class _ProductState extends State<Product> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: cBackColor,
-        body: Container(
-          color: cBackColor,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 15, right: 0, top: 20, bottom: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkResponse(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: SvgPicture.asset(
-                          'assets/icons/back_register.svg',
-                          color: cFirstColor,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width - 160,
-                      child: Text(
-                        widget.brendList.nomi,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            color: cFirstColor,
-                            fontSize: 22),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 60,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(bottom: 5, top: 5),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: cWhiteColor),
-                height: 55,
-                padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
-                child: Container(
-                  child: TextFormField(
-                    keyboardType: TextInputType.text,
-                    cursorColor: cFirstColor,
-                    textCapitalization: TextCapitalization.none,
-                    controller: search,
-                    autofocus: false,
-                    onChanged: (text) {
-                      filterSearchResults(text);
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: cBackColor,
+      body: Container(
+        color: cBackColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            SizedBox(
+              height: 40,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 15, right: 0, top: 20, bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkResponse(
+                    onTap: () {
+                      Navigator.pop(context);
                     },
-                    decoration: InputDecoration(
-                      hintText: 'Қидириш',
-                      hintStyle: TextStyle(
-                        color: cTextColor2,
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      prefixIconConstraints: BoxConstraints(
-                        maxWidth: 30,
-                        maxHeight: 30,
-                        minHeight: 25,
-                        minWidth: 25,
-                      ),
-                      contentPadding:
-                          EdgeInsets.only(top: 5 // HERE THE IMPORTANT PART
-                              ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.fromLTRB(2.0, 0, 6.0, 0),
-                        child: SvgPicture.asset(
-                          'assets/icons/search.svg',
-                        ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: SvgPicture.asset(
+                        'assets/icons/back_register.svg',
+                        color: cFirstColor,
                       ),
                     ),
-                    style: TextStyle(fontSize: 16, color: cFirstColor),
                   ),
-                  width: MediaQuery.of(context).size.width - 60,
-                  // margin: EdgeInsets.only(right: 50),
-                ),
+                  Container(
+                    width: MediaQuery.of(context).size.width - 160,
+                    child: Text(
+                      widget.brendList.nomi,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: cFirstColor,
+                          fontSize: 22),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 60,
+                  ),
+                ],
               ),
-              Expanded(
-                child: loadingProduct
-                    ? Center(child: widgetProduct)
-                    : Container(
-                        child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: tovarList.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              height: 120,
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 20),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: cWhiteColor),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Card(
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: InkResponse(
-                                        onTap: () {
-                                          if (tovarList[index].rasmi != "")
-                                            _showSecondPage(
-                                                context,
-                                                baseUrlImg +
-                                                    (tovarList[index].rasmi!)
-                                                        .replaceFirst('.', ''),
-                                                tovarList[index].rasmi!);
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 12),
-                                          width: 95,
-                                          height: 100,
-                                          decoration: BoxDecoration(
-                                              color: cBackColorImage2,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: ClipRRect(
+            ),
+            Container(
+              margin: EdgeInsets.only(bottom: 5, top: 5),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: cWhiteColor),
+              height: 55,
+              padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+              child: Container(
+                child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  cursorColor: cFirstColor,
+                  textCapitalization: TextCapitalization.none,
+                  controller: search,
+                  autofocus: false,
+                  onChanged: (text) {
+                    filterSearchResults(text);
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Қидириш',
+                    hintStyle: TextStyle(
+                      color: cTextColor2,
+                      fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    prefixIconConstraints: BoxConstraints(
+                      maxWidth: 30,
+                      maxHeight: 30,
+                      minHeight: 25,
+                      minWidth: 25,
+                    ),
+                    contentPadding:
+                        EdgeInsets.only(top: 5 // HERE THE IMPORTANT PART
+                            ),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.fromLTRB(2.0, 0, 6.0, 0),
+                      child: SvgPicture.asset(
+                        'assets/icons/search.svg',
+                      ),
+                    ),
+                  ),
+                  style: TextStyle(fontSize: 16, color: cFirstColor),
+                ),
+                width: MediaQuery.of(context).size.width - 60,
+                // margin: EdgeInsets.only(right: 50),
+              ),
+            ),
+            Expanded(
+              child: loadingProduct
+                  ? Center(child: widgetProduct)
+                  : Container(
+                      child: ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(0),
+                        itemCount: tovarList.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            height: 120,
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 20),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: cWhiteColor),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Card(
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7)),
+                                    child: InkResponse(
+                                      onTap: () {
+                                        if (tovarList[index].rasmi != "")
+                                          _showSecondPage(
+                                              context,
+                                              baseUrl +
+                                                  imgTovar +
+                                                  (tovarList[index].tovarId!) +
+                                                  ".png",
+                                              baseUrl +
+                                                  imgTovar +
+                                                  (tovarList[index].tovarId!) +
+                                                  ".png");
+                                      },
+                                      child: Container(
+                                        margin: EdgeInsets.only(left: 12),
+                                        width: 95,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                            color: cBackColorImage2,
                                             borderRadius:
-                                                BorderRadius.circular(10),
-                                            // child: Container(
-                                            //   margin: EdgeInsets.all(35),
-                                            //   child: SvgPicture.asset(
-                                            //     'assets/icons/placeholder.svg',
-                                            //   ),
-                                            // ),
-                                            child: CachedNetworkImage(
-                                              imageUrl: baseUrlImg +
-                                                  (tovarList[index].rasmi!)
-                                                      .replaceFirst('.', ''),
-                                              placeholder: (context, url) =>
-                                                  Container(
-                                                margin: EdgeInsets.all(35),
-                                                child: SvgPicture.asset(
-                                                  'assets/icons/placeholder.svg',
-                                                ),
+                                                BorderRadius.circular(10)),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          // child: Container(
+                                          //   margin: EdgeInsets.all(35),
+                                          //   child: SvgPicture.asset(
+                                          //     'assets/icons/placeholder.svg',
+                                          //   ),
+                                          // ),
+                                          child: CachedNetworkImage(
+                                            imageUrl: baseUrl +
+                                                imgTovar +
+                                                (tovarList[index].tovarId!) +
+                                                ".png",
+                                            placeholder: (context, url) =>
+                                                Container(
+                                              margin: EdgeInsets.all(35),
+                                              child: SvgPicture.asset(
+                                                'assets/icons/placeholder.svg',
                                               ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Container(
-                                                margin: EdgeInsets.all(35),
-                                                child: SvgPicture.asset(
-                                                  'assets/icons/placeholder.svg',
-                                                ),
-                                              ),
-                                              fit: BoxFit.fill,
                                             ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Container(
+                                              margin: EdgeInsets.all(35),
+                                              child: SvgPicture.asset(
+                                                'assets/icons/placeholder.svg',
+                                              ),
+                                            ),
+                                            fit: BoxFit.fill,
                                           ),
                                         ),
                                       ),
                                     ),
-                                    flex: 12,
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                          left: 15, right: 15, top: 10),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            child: Text(
-                                              tovarList[index].nomi!.trim(),
-                                              maxLines: 2,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: cFirstColor,
-                                                  fontWeight: FontWeight.w500),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          Text(
-                                            getNarx(index),
+                                  flex: 12,
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                        left: 15, right: 15, top: 10),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          child: Text(
+                                            tovarList[index].nomi!.trim(),
+                                            maxLines: 2,
                                             style: TextStyle(
-                                              fontSize: 13,
-                                              color: cRedColor,
-                                            ),
-                                            maxLines: 1,
+                                                fontSize: 14,
+                                                color: cFirstColor,
+                                                fontWeight: FontWeight.w500),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          Container(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                MaterialButton(
-                                                  onPressed: () {
-                                                    FocusScope.of(context)
-                                                        .requestFocus(
-                                                            FocusNode());
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ProductInfo(
-                                                          tovarList:
-                                                              tovarList[index],
-                                                        ),
+                                        ),
+                                        Text(
+                                          getNarx(index),
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: cRedColor,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                        Container(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              MaterialButton(
+                                                onPressed: () {
+                                                  FocusScope.of(context)
+                                                      .requestFocus(
+                                                          FocusNode());
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ProductInfo(
+                                                        tovarList:
+                                                            tovarList[index],
                                                       ),
-                                                    );
-                                                  },
-                                                  child: Text(
-                                                    'Саватчага қушиш',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: cWhiteColor,
-                                                      fontSize: 13,
                                                     ),
+                                                  );
+                                                },
+                                                child: Text(
+                                                  'Саватчага қушиш',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: cWhiteColor,
+                                                    fontSize: 13,
                                                   ),
-                                                  color: cFirstColor,
-                                                  height: 35,
-                                                  minWidth: 135,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7)),
-                                                  elevation: 0,
                                                 ),
-                                              ],
-                                            ),
-                                            margin: EdgeInsets.only(
-                                                right: 0, top: 3),
+                                                color: cFirstColor,
+                                                height: 35,
+                                                minWidth: 135,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            7)),
+                                                elevation: 0,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                          margin:
+                                              EdgeInsets.only(right: 0, top: 3),
+                                        ),
+                                      ],
                                     ),
-                                    flex: 20,
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                                  flex: 20,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-              ),
-            ],
-          ),
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -350,7 +357,10 @@ class _ProductState extends State<Product> {
   }
 
   String getNarx(int index) {
-    String narx = tovarList[index].nalichNarxi! + " сўм";
+    String narx = format
+            .format(double.tryParse(tovarList[index].nalichNarxi!.toString()))
+            .toString() +
+        " сўм";
     return narx;
   }
 }
