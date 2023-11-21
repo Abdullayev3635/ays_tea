@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
 //   lng = position.longitude.toString();
 // }
 
+
 void onStart() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // final service = FlutterBackgroundService();
