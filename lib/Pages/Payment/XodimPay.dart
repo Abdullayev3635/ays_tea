@@ -1,10 +1,10 @@
 import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
+import 'package:zilol_ays_tea/Pages/Dialogs/SelectDialogRegion.dart';
 import 'package:zilol_ays_tea/Pages/Payment/qr_scan.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +32,8 @@ class _XodimPayState extends State<XodimPay> {
 
   TextEditingController izoh = TextEditingController();
   String client_name = "Мижозни танланг";
+  String regionName = "Худудни танланг";
+  String regionId = "";
   String clientId = "";
   String agent_id = "";
   String canPay = "";
@@ -99,14 +101,7 @@ class _XodimPayState extends State<XodimPay> {
       ),
     );
     if (response.statusCode == 200) {
-      client_name = "Мижозни танланг";
-      clientId = "";
-      agent_id = "";
-      summasum.text = "";
-      izoh.text = "";
-      qarzi_som = 0;
-      loadingSave = false;
-      setState(() {});
+      Navigator.pop(context);
     } else {
       loadingSave = false;
       setState(() {});
@@ -144,13 +139,16 @@ class _XodimPayState extends State<XodimPay> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkResponse(
-                    onTap: () => Scaffold.of(context).openDrawer(),
-                    child: Image.asset(
-                      "assets/images/menu_icon.png",
-                      color: cFirstColor,
-                      height: 30,
-                      width: 30,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 15.0, 15.0, 15.0),
+                      child: SvgPicture.asset(
+                        'assets/icons/back_register.svg',
+                        color: cFirstColor,
+                      ),
                     ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   ),
                   Text(
                     'Тўлов Қилиш',
@@ -179,18 +177,67 @@ class _XodimPayState extends State<XodimPay> {
               child: InkWell(
                 onTap: () {
                   showDialog(
-                    barrierDismissible: false,
+                    barrierDismissible: true,
                     context: context,
                     builder: (BuildContext context) {
-                      return SelectDialogClient();
+                      return SelectDialogRegion();
                     },
                   ).then((value) {
                     if (value != null) {
-                      client_name = value['mijoz_nomi'];
-                      clientId = value['mijoz_id'];
-                      getHistory();
+                      regionName = value['region_name'];
+                      regionId = value['region_id'];
+                      setState(() {});
                     }
                   });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        regionName,
+                        style: TextStyle(color: cFirstColor, fontSize: 14),
+                        maxLines: 1,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_drop_down_sharp,
+                      color: cFirstColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: cBackColor3),
+              height: 55,
+              alignment: Alignment.centerLeft,
+              child: InkWell(
+                onTap: () {
+                  if(regionId==""){
+                    _showToast(context, "Худудни танланг");
+                  } else {
+                    showDialog(
+                      barrierDismissible: true,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SelectDialogClient(regionId: regionId,);
+                      },
+                    ).then((value) {
+                      if (value != null) {
+                        client_name = value['mijoz_nomi'];
+                        clientId = value['mijoz_id'];
+                        getHistory();
+                      }
+                    });
+                  }
+
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -330,7 +377,8 @@ class _XodimPayState extends State<XodimPay> {
                                 child: const Text('Йўқ'),
                                 onPressed: () {
                                   Navigator.pop(context, ButtonAction.cancel);
-                                  FocusScope.of(context).requestFocus(FocusNode());
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
                                 },
                               ),
                               TextButton(
@@ -338,7 +386,8 @@ class _XodimPayState extends State<XodimPay> {
                                 onPressed: () {
                                   inPay();
                                   Navigator.pop(context, ButtonAction.cancel);
-                                  FocusScope.of(context).requestFocus(FocusNode());
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
                                 },
                               ),
                             ],

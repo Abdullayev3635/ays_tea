@@ -148,40 +148,6 @@ class _ReportPageState extends State<ReportPage> {
                 ),
                 visible: ReestrRealizatsiya == "0" || turi == "1",
               ),
-              // SizedBox(
-              //   height: 15,
-              // ),
-              // MaterialButton(
-              //   onPressed: () {
-              //     showDialog(
-              //       barrierDismissible: false,
-              //       context: context,
-              //       builder: (BuildContext context) {
-              //         return XisobotDialog(
-              //           title: "Тўлов Рейстри",
-              //           isClient: turi=="1",
-              //           date2: true,
-              //           isRegion: false,
-              //         );
-              //       },
-              //     );
-              //   },
-              //   child: Text(
-              //     'Тўлов Рейстри',
-              //     style: TextStyle(
-              //       fontSize: 14,
-              //       fontFamily: 'SFUIDisplay',
-              //       fontWeight: FontWeight.w400,
-              //     ),
-              //   ),
-              //   color: cFirstColor,
-              //   elevation: 0,
-              //   minWidth: 400,
-              //   height: 55,
-              //   textColor: Colors.white,
-              //   shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10)),
-              // ),
               Visibility(
                 child: SizedBox(
                   height: 15,
@@ -202,7 +168,7 @@ class _ReportPageState extends State<ReportPage> {
                           isClient: turi == "1",
                           date2: false,
                           queryType: "5",
-                          isRegion: true,
+                          isRegion: turi != "1",
                           isSelectClient: false,
                         );
                       },

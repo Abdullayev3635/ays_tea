@@ -16,9 +16,9 @@ import 'package:getwidget/types/gf_loader_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-class CartPage extends StatefulWidget {
+class CartPage2 extends StatefulWidget {
   @override
-  _CartPageState createState() => _CartPageState();
+  _CartPage2State createState() => _CartPage2State();
 }
 
 enum ButtonAction {
@@ -26,7 +26,7 @@ enum ButtonAction {
   agree,
 }
 
-class _CartPageState extends State<CartPage> {
+class _CartPage2State extends State<CartPage2> {
   List<KarzinaModel> cartList = [];
   Future<List<KarzinaModel>>? _carts;
   DataHelper _dataHelper = DataHelper();
@@ -123,13 +123,17 @@ class _CartPageState extends State<CartPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkResponse(
-                      onTap: () => Scaffold.of(context).openDrawer(),
-                      child: Image.asset(
-                        "assets/images/menu_icon.png",
-                        color: cFirstColor,
-                        height: 30,
-                        width: 30,
+                      child: Padding(
+                        padding:
+                        const EdgeInsets.fromLTRB(0, 15.0, 15.0, 15.0),
+                        child: SvgPicture.asset(
+                          'assets/icons/back_register.svg',
+                          color: cFirstColor,
+                        ),
                       ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
                     ),
                     Text(
                       'Саватча',

@@ -9,6 +9,10 @@ import 'package:flutter/material.dart';
 import '../../Models/MijozModel.dart';
 
 class SelectDialogClient extends StatefulWidget {
+  const SelectDialogClient({this.regionId});
+
+  final regionId;
+
   @override
   _SelectDialogClientState createState() => _SelectDialogClientState();
 }
@@ -46,7 +50,10 @@ class _SelectDialogClientState extends State<SelectDialogClient> {
   @override
   void initState() {
     loading = true;
-    widgetMain = Center(child: CupertinoActivityIndicator(color: cBlackColor,));
+    widgetMain = Center(
+        child: CupertinoActivityIndicator(
+      color: cBlackColor,
+    ));
     setState(() {});
     getMijoz();
     super.initState();
@@ -159,7 +166,13 @@ class _SelectDialogClientState extends State<SelectDialogClient> {
     if (response.statusCode == 200) {
       final parsed = jsonDecode(response.data);
       for (int i = 0; i < (parsed as List).length; i++) {
-        clientList.add(MijozModel.fromJson(parsed[i]));
+        if(widget.regionId!=null){
+          if(widget.regionId==parsed[i]["region_id"]){
+            clientList.add(MijozModel.fromJson(parsed[i]));
+          }
+        } else {
+          clientList.add(MijozModel.fromJson(parsed[i]));
+        }
       }
     }
     clientlarList.addAll(clientList);

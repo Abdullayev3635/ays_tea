@@ -12,6 +12,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Canstants/Texts.dart';
+import '../Dialogs/NotInternetDialog.dart';
 import '../Dialogs/SelectDialogRegion.dart';
 import '../MainPages/MainPage/MainPage.dart';
 
@@ -34,16 +35,21 @@ class _RegistPageState extends State<RegistPage> {
   TextEditingController pass = TextEditingController();
   TextEditingController pass_again = TextEditingController();
   TextEditingController fio = TextEditingController();
+  TextEditingController nomi = TextEditingController();
   TextEditingController telefon = TextEditingController();
   TextEditingController inn = TextEditingController();
 
   late double latitude;
   late double longitude;
+  bool checkedValue = true;
 
   // late Position position;
   String regionName = "Ҳудудни танланг";
   String regionId = "";
   Position? position;
+  int innLength = 14;
+  String innName = "JSHR";
+  String selectedValue = "1";
 
   String urlPath1 = "";
   var maskFormatter = new MaskTextInputFormatter(
@@ -127,21 +133,6 @@ class _RegistPageState extends State<RegistPage> {
                 height: 10,
               ),
               Container(
-                height: 120,
-                width: 120,
-                child: CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  child: Image.asset(
-                    "assets/images/person_png.png",
-                    height: 120,
-                    width: 120,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: cWhiteColor),
@@ -153,7 +144,33 @@ class _RegistPageState extends State<RegistPage> {
                     cursorColor: cFirstColor,
                     controller: fio,
                     decoration: InputDecoration(
-                      hintText: 'Исм Фамилия',
+                      hintText: 'Маркетни номи',
+                      hintStyle: TextStyle(
+                        color: cSecondColor,
+                        fontSize: 14,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    style: TextStyle(fontSize: 16, color: cFirstColor),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: cWhiteColor),
+                height: 55,
+                padding: EdgeInsets.fromLTRB(15, 0, 5, 0),
+                child: Center(
+                  child: TextFormField(
+                    keyboardType: TextInputType.text,
+                    cursorColor: cFirstColor,
+                    controller: nomi,
+                    decoration: InputDecoration(
+                      hintText: 'Корхона номи',
                       hintStyle: TextStyle(
                         color: cSecondColor,
                         fontSize: 14,
@@ -225,8 +242,9 @@ class _RegistPageState extends State<RegistPage> {
                           keyboardType: TextInputType.text,
                           cursorColor: cFirstColor,
                           controller: inn,
+                          maxLines: 1,
                           decoration: InputDecoration(
-                            hintText: 'ИНН',
+                            hintText: innName,
                             hintStyle: TextStyle(
                               color: cSecondColor,
                               fontSize: 14,
@@ -234,19 +252,21 @@ class _RegistPageState extends State<RegistPage> {
                             border: InputBorder.none,
                           ),
                           onChanged: (value) {
-                            if ((value.length < 9) || (value.length > 9)) {
+                            if (value.length == 0) {
+                              loadingINNAvialble = false;
+                              setState(() {});
+                            } else if ((value.length < innLength) ||
+                                (value.length > innLength)) {
                               loadingINNAvialble = true;
                               errorTXT =
-                                  "Киритилган Инн нинг узунлиги 9 та болиши керак!";
+                                  "Киритилган $innName нинг узунлиги $innLength та болиши керак!";
                               setState(() {});
                             } else {
                               loadingINNAvialble = false;
                               setState(() {});
                             }
                           },
-                          onEditingComplete: () {
-                            checkInn(inn.text);
-                          },
+                          onEditingComplete: () {},
                           style: TextStyle(fontSize: 16, color: cFirstColor),
                         ),
                       ),
@@ -260,6 +280,98 @@ class _RegistPageState extends State<RegistPage> {
                   ),
                 ),
               ),
+              SizedBox(
+                height: 6,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      if (checkedValue) {
+                        innName = "INN";
+                        innLength = 9;
+                      } else {
+                        innName = "JSHR";
+                        innLength = 14;
+                      }
+                      setState(() {
+                        checkedValue = !checkedValue;
+                      });
+                      if ((inn.text.length < innLength) ||
+                          (inn.text.length > innLength)) {
+                        loadingINNAvialble = true;
+                        errorTXT =
+                            "Киритилган $innName нинг узунлиги $innLength та болиши керак!";
+                        setState(() {});
+                      } else if (inn.text.length == 0) {
+                        loadingINNAvialble = false;
+                        setState(() {});
+                      } else {
+                        loadingINNAvialble = false;
+                        setState(() {});
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.only(left: 2),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (checkedValue) {
+                                innName = "INN";
+                                innLength = 9;
+                              } else {
+                                innName = "JSHR";
+                                innLength = 14;
+                              }
+                              setState(() {
+                                checkedValue = !checkedValue;
+                              });
+                              if ((inn.text.length < innLength) ||
+                                  (inn.text.length > innLength)) {
+                                loadingINNAvialble = true;
+                                errorTXT =
+                                    "Киритилган $innName нинг узунлиги $innLength та болиши керак!";
+                                setState(() {});
+                              } else if (inn.text.length == 0) {
+                                loadingINNAvialble = false;
+                                setState(() {});
+                              } else {
+                                loadingINNAvialble = false;
+                                setState(() {});
+                              }
+                            },
+                            child: checkedValue
+                                ? Icon(
+                                    Icons.radio_button_unchecked,
+                                    color: cFirstColor,
+                                    size: 17,
+                                  )
+                                : SvgPicture.asset(
+                                    "assets/icons/check_box.svg",
+                                    color: cFirstColor,
+                                    height: 17,
+                                    width: 17,
+                                  ),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            "Yuridik shaxs",
+                            style: TextStyle(
+                              color: cTextColor,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  SizedBox(),
+                ],
+              ),
               Container(
                 margin: EdgeInsets.only(left: 12),
                 child: loadingINNAvialble
@@ -270,7 +382,7 @@ class _RegistPageState extends State<RegistPage> {
                     : SizedBox(),
               ),
               SizedBox(
-                height: 15,
+                height: 6,
               ),
               InkWell(
                 onTap: () {
@@ -406,10 +518,26 @@ class _RegistPageState extends State<RegistPage> {
                     _showToast(context, 'Жараён тўлиқ амалга ошишини кутинг!');
                   } else if (fio.text == "") {
                     _showToast(context, 'Исм Фамилянгизни киритинг!');
+                  } else if (nomi.text == "") {
+                    _showToast(context, 'Корхона номини киритинг!');
                   } else if (maskFormatter.getUnmaskedText().toString() == "") {
                     _showToast(context, 'Телефон рақамингизни киритинг!');
+                  } else if (!loading) {
+                    check().then((intenet) async {
+                      if (intenet) {
+                        checkInn(inn.text);
+                      } else if (!intenet) {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return NotInternetDialog();
+                          },
+                        ).then((value) => checkInn(inn.text));
+                      }
+                    });
                   } else {
-                    inRegister();
+                    print("xato");
                   }
                 },
                 //since this is only a UI app
@@ -499,8 +627,9 @@ class _RegistPageState extends State<RegistPage> {
         errorTXT = "Киритилган Инн базада мавжуд!";
       } else {
         loadingINNAvialble = false;
+        errorTXT = "";
+        inRegister();
       }
-      errorTXT = "";
       loadingINN = false;
       setState(() {});
     }
@@ -509,8 +638,14 @@ class _RegistPageState extends State<RegistPage> {
   void inRegister() async {
     loading = true;
     setState(() {});
+    String lat = "0.0";
+    String long = "0.0";
+    if (position != null) {
+      lat = position!.latitude.toString();
+      long = position!.longitude.toString();
+    }
     final Dio dio = Dio();
-    final txt = fio.text +
+    final txt = nomi.text +
         "~+998" +
         maskFormatter.getUnmaskedText().toString() +
         "~" +
@@ -520,9 +655,11 @@ class _RegistPageState extends State<RegistPage> {
         "~" +
         pass.text +
         "~" +
-        position!.latitude.toString() +
+        lat +
         "~" +
-        position!.longitude.toString();
+        long +
+        "~" +
+        fio.text;
 
     var formData = FormData.fromMap({
       "user_id": "1",
@@ -544,7 +681,7 @@ class _RegistPageState extends State<RegistPage> {
   }
 
   void lastQuery(final lastId) async {
-    count += count;
+    count += 1;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final formData2 = FormData.fromMap({"user_id": "1", "sorov_id": lastId});
     final response2 = await Dio().post(
@@ -557,7 +694,7 @@ class _RegistPageState extends State<RegistPage> {
     );
     if (response2.statusCode == 200) {
       if (response2.data != "" && response2.data != "no") {
-        if (response2.data != "0") {
+        if (response2.data != "0" && response2.data != 0) {
           await prefs.setString('mijoz_id', response2.data);
           await prefs.setString('fio', fio.text);
           await prefs.setString('boshagan', "0");
@@ -578,7 +715,7 @@ class _RegistPageState extends State<RegistPage> {
         loading = false;
         setState(() {});
       } else {
-        if (count < 60) {
+        if (count < 300) {
           await Future.delayed(const Duration(milliseconds: 500));
           lastQuery(lastId);
         } else {

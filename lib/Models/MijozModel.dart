@@ -1,5 +1,6 @@
 class MijozModel {
   String? mijozId;
+  String? regionId;
   String? fio;
   String? inn;
   String? boshagan;
@@ -8,6 +9,7 @@ class MijozModel {
 
   MijozModel(
       {this.mijozId,
+        this.regionId,
         this.fio,
         this.inn,
         this.boshagan,
@@ -16,6 +18,7 @@ class MijozModel {
 
   MijozModel.fromJson(Map<String, dynamic> json) {
     mijozId = json['mijoz_id'];
+    regionId = json['region_id'];
     fio = json['fio'];
     inn = json['inn'];
     boshagan = json['boshagan'];
@@ -26,6 +29,7 @@ class MijozModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['mijoz_id'] = this.mijozId;
+    data['region_id'] = this.regionId;
     data['fio'] = this.fio;
     data['inn'] = this.inn;
     data['boshagan'] = this.boshagan;

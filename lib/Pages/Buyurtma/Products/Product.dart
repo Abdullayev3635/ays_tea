@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/Models/BrendModel.dart';
@@ -26,6 +27,7 @@ class _ProductState extends State<Product> {
   TextEditingController search = TextEditingController();
   List<TovarModel> tovarList = [];
   List<TovarModel> tovarListFake = [];
+  String released = "0";
   bool loadingProduct = true;
   late Widget widgetProduct = Center(
       child: CupertinoActivityIndicator(
@@ -40,6 +42,8 @@ class _ProductState extends State<Product> {
   }
 
   Future<void> doSomeBrend(String bolim_id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    released = prefs.getString("boshagan") ?? "0";
     webServis netService = webServis();
     tovarList = await netService.getTovar(bolim_id);
     tovarListFake.addAll(tovarList);
@@ -106,9 +110,10 @@ class _ProductState extends State<Product> {
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          color: cFirstColor,
-                          fontSize: 22),
+                        fontWeight: FontWeight.w400,
+                        color: cFirstColor,
+                        fontSize: 22,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -190,7 +195,7 @@ class _ProductState extends State<Product> {
                                         borderRadius: BorderRadius.circular(7)),
                                     child: InkResponse(
                                       onTap: () {
-                                        if (tovarList[index].rasmi != "")
+                                        if (tovarList[index].tovarId != "")
                                           _showSecondPage(
                                               context,
                                               baseUrl +
@@ -203,44 +208,34 @@ class _ProductState extends State<Product> {
                                                   ".png");
                                       },
                                       child: Container(
-                                        margin: EdgeInsets.only(left: 12),
-                                        width: 95,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                            color: cBackColorImage2,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          // child: Container(
-                                          //   margin: EdgeInsets.all(35),
-                                          //   child: SvgPicture.asset(
-                                          //     'assets/icons/placeholder.svg',
-                                          //   ),
-                                          // ),
-                                          child: CachedNetworkImage(
-                                            imageUrl: baseUrl +
-                                                imgTovar +
-                                                (tovarList[index].tovarId!) +
-                                                ".png",
-                                            placeholder: (context, url) =>
-                                                Container(
-                                              margin: EdgeInsets.all(35),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/placeholder.svg',
-                                              ),
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                2.3,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        color: Colors.transparent,
+                                        child: CachedNetworkImage(
+                                          imageUrl: baseUrl +
+                                              imgTovar +
+                                              tovarList[index]
+                                                  .tovarId
+                                                  .toString() +
+                                              ".png",
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            margin: EdgeInsets.all(32),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/placeholder.svg',
                                             ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                              margin: EdgeInsets.all(35),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/placeholder.svg',
-                                              ),
-                                            ),
-                                            fit: BoxFit.fill,
                                           ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            margin: EdgeInsets.all(32),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/placeholder.svg',
+                                            ),
+                                          ),
+                                          fit: BoxFit.fitHeight,
                                         ),
                                       ),
                                     ),
@@ -260,9 +255,9 @@ class _ProductState extends State<Product> {
                                         Container(
                                           child: Text(
                                             tovarList[index].nomi!.trim(),
-                                            maxLines: 2,
+                                            maxLines: 1,
                                             style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 color: cFirstColor,
                                                 fontWeight: FontWeight.w500),
                                             overflow: TextOverflow.ellipsis,
@@ -276,6 +271,30 @@ class _ProductState extends State<Product> {
                                           ),
                                           maxLines: 1,
                                         ),
+                                        Visibility(
+                                          child: Text(
+                                            "Ҳозирда сотиб олиб бўлмайди!",
+                                            style: TextStyle(
+                                              fontSize: 8,
+                                              color: cRedColor,
+                                            ),
+                                            maxLines: 1,
+                                          ),
+                                          visible: tovarList[index].bloklandi !=
+                                                  "0" &&
+                                              released == "0",
+                                        ),
+                                        Visibility(
+                                          child: Text(
+                                            "Сизнинг фаолиятингиз чекланган!",
+                                            style: TextStyle(
+                                              fontSize: 8,
+                                              color: cRedColor,
+                                            ),
+                                            maxLines: 1,
+                                          ),
+                                          visible: released == "1",
+                                        ),
                                         Container(
                                           child: Row(
                                             mainAxisAlignment:
@@ -283,31 +302,41 @@ class _ProductState extends State<Product> {
                                             children: [
                                               MaterialButton(
                                                 onPressed: () {
-                                                  FocusScope.of(context)
-                                                      .requestFocus(
-                                                          FocusNode());
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProductInfo(
-                                                        tovarList:
-                                                            tovarList[index],
+                                                  if (tovarList[index]
+                                                              .bloklandi ==
+                                                          "0" &&
+                                                      released == "0") {
+                                                    FocusScope.of(context)
+                                                        .requestFocus(
+                                                            FocusNode());
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ProductInfo(
+                                                          tovarList:
+                                                              tovarList[index],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
+                                                    );
+                                                  }
                                                 },
                                                 child: Text(
                                                   'Саватчага қушиш',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
                                                     color: cWhiteColor,
-                                                    fontSize: 13,
+                                                    fontSize: 11,
                                                   ),
                                                 ),
-                                                color: cFirstColor,
-                                                height: 35,
-                                                minWidth: 135,
+                                                color: tovarList[index]
+                                                                .bloklandi ==
+                                                            "0" &&
+                                                        released == "0"
+                                                    ? cFirstColor
+                                                    : cGrayColor,
+                                                height: 30,
+                                                minWidth: 115,
                                                 shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -317,7 +346,7 @@ class _ProductState extends State<Product> {
                                             ],
                                           ),
                                           margin:
-                                              EdgeInsets.only(right: 0, top: 3),
+                                              EdgeInsets.only(right: 0, top: 0),
                                         ),
                                       ],
                                     ),

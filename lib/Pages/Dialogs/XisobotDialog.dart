@@ -34,8 +34,8 @@ class XisobotDialog extends StatefulWidget {
 }
 
 class _XisobotDialogState extends State<XisobotDialog> {
-  DateTime? selectedDatebosh;
-  DateTime? selectedDateoxir;
+  DateTime selectedDatebosh = DateTime.now();
+  DateTime selectedDateoxir = DateTime.now();
   var customFormat = DateFormat('yyyy-MM-dd');
 
   String clientName = "Мижозни танланг";
@@ -60,6 +60,9 @@ class _XisobotDialogState extends State<XisobotDialog> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     agentId = prefs.getString('agent_id') ?? "0";
     turi = prefs.getString('turi') ?? "0";
+    if (turi == "1") {
+      clientId = prefs.getString('mijoz_id') ?? "0";
+    }
   }
 
   @override
@@ -130,9 +133,7 @@ class _XisobotDialogState extends State<XisobotDialog> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            selectedDatebosh == null
-                                ? "Дата 1"
-                                : customFormat.format(selectedDatebosh!),
+                            customFormat.format(selectedDatebosh),
                             style: TextStyle(color: cFirstColor, fontSize: 14),
                           ),
                           Icon(
@@ -164,9 +165,7 @@ class _XisobotDialogState extends State<XisobotDialog> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              selectedDateoxir == null
-                                  ? "Дата 2"
-                                  : customFormat.format(selectedDateoxir!),
+                              customFormat.format(selectedDateoxir),
                               style:
                                   TextStyle(color: cFirstColor, fontSize: 14),
                             ),
@@ -329,9 +328,9 @@ class _XisobotDialogState extends State<XisobotDialog> {
     var formData = FormData.fromMap({
       "user_id": agentId,
       "sorov_turi": widget.queryType,
-      "sorov_izox": customFormat.format(selectedDatebosh!).toString() +
+      "sorov_izox": customFormat.format(selectedDatebosh).toString() +
           "~" +
-          customFormat.format(selectedDateoxir!).toString() +
+          customFormat.format(selectedDateoxir).toString() +
           "~" +
           clientId +
           "~" +
@@ -428,7 +427,7 @@ class _XisobotDialogState extends State<XisobotDialog> {
       });
     } else {
       setState(() {
-        selectedDateoxir = picked;
+        selectedDateoxir = picked!;
       });
     }
   }

@@ -23,8 +23,12 @@ class ProductInfo extends StatefulWidget {
 
 class _ProductInfoState extends State<ProductInfo> {
   double count = 1;
+  double countBloc = 0;
+  num norma = 0;
   bool _buttonPressed = false;
   bool _loopActive = false;
+  bool _buttonPressedBloc = false;
+  bool _loopActiveBloc = false;
   DataHelper _dataHelper = DataHelper();
   var numGenerator = new Random();
 
@@ -33,6 +37,7 @@ class _ProductInfoState extends State<ProductInfo> {
   KarzinaModel? _karzinaModel;
 
   TextEditingController countController = TextEditingController();
+  TextEditingController countControllerBloc = TextEditingController();
 
   ScrollController _scrollController = new ScrollController();
   static const _locale = 'en';
@@ -47,15 +52,19 @@ class _ProductInfoState extends State<ProductInfo> {
   }
 
   void loadCount() async {
+    norma = double.tryParse(widget.tovarList.norma ?? "0") ?? 0;
     _karzinaModel =
         await _dataHelper.getCartById(widget.tovarList.tovarId.toString());
     if (_karzinaModel == null) {
       countController.text = "1.0";
+      countControllerBloc.text = "0.0";
       final s =
           '${_formatNumber(getNarx(widget.tovarList.nalichNarxi!).replaceAll(',', ''))}';
     } else {
       countController.text = _karzinaModel!.miqdorSoni.toString();
+      countControllerBloc.text = _karzinaModel!.miqdorBlok.toString();
       count = double.parse(_karzinaModel!.miqdorSoni);
+      countBloc = double.parse(_karzinaModel!.miqdorBlok);
     }
   }
 
@@ -73,7 +82,6 @@ class _ProductInfoState extends State<ProductInfo> {
           width: MediaQuery.of(context).size.width,
           child: ListView(
             shrinkWrap: true,
-            addAutomaticKeepAlives: true,
             padding: EdgeInsets.all(0),
             controller: _scrollController,
             children: [
@@ -164,162 +172,235 @@ class _ProductInfoState extends State<ProductInfo> {
                           fontWeight: FontWeight.w400),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 7,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 15),
+                      margin: EdgeInsets.symmetric(horizontal: 0),
                       child: Divider(
                         height: 1,
                         color: cTextColor2,
                       ),
                     ),
                     SizedBox(
-                      height: 12,
+                      height: 7,
                     ),
-                    // Text(
-                    //   "Махсулот қолдиғи: " +
-                    //       widget.tovarList.qoldiq.toString(),
-                    //   style: TextStyle(
-                    //       fontWeight: FontWeight.w300,
-                    //       color: cRedColor,
-                    //       fontSize: 16),
-                    // ),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
+                    Text(
+                      "Блокда",
+                      style: TextStyle(
+                          color: cFirstColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    Center(
+                      child: Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Listener(
+                              child:
+                                  SvgPicture.asset('assets/icons/minus_oq.svg', height: 45, width: 45,),
+                              onPointerDown: (details) {
+                                _buttonPressedBloc = true;
+                                _decreaseCounterWhilePressedBloc();
+                              },
+                              onPointerUp: (details) {
+                                _buttonPressedBloc = false;
+                              },
+                            ),
+                            SizedBox(
+                              width: 18,
+                            ),
+                            Container(
+                              height: 35,
+                              width: 90,
+                              padding: EdgeInsets.only(bottom: 3),
+                              decoration: BoxDecoration(
+                                  color: cBackColor4,
+                                  borderRadius: BorderRadius.circular(18)),
+                              child: Center(
+                                child: TextField(
+                                  controller: countControllerBloc,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  readOnly: false,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                  ),
+                                  style: TextStyle(
+                                      color: cWhiteColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 17),
+                                  onChanged: (value) {
+                                    try {
+                                      countController
+                                          .text = (double.tryParse(value)! *
+                                              double.tryParse(
+                                                  widget.tovarList.blokSoni!)!)
+                                          .toString();
+                                      countBloc = double.parse(value);
+                                      count = countBloc * double.tryParse(widget.tovarList.blokSoni!)!;
+                                      setState(() {});
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 18,
+                            ),
+                            Listener(
+                              child:
+                                  SvgPicture.asset('assets/icons/plus_oq.svg', height: 45, width: 45,),
+                              onPointerDown: (details) {
+                                _buttonPressedBloc = true;
+                                _increaseCounterWhilePressedBloc();
+                              },
+                              onPointerUp: (details) {
+                                _buttonPressedBloc = false;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 7,
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 0),
+                      child: Divider(
+                        height: 1,
+                        color: cTextColor2,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 7,
+                    ),
+                    Text(
+                      "Донада",
+                      style: TextStyle(
+                          color: cFirstColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    Center(
+                      child: Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Listener(
+                              child:
+                                  SvgPicture.asset('assets/icons/minus_oq.svg', height: 45, width: 45,),
+                              onPointerDown: (details) {
+                                _buttonPressed = true;
+                                _decreaseCounterWhilePressed();
+                              },
+                              onPointerUp: (details) {
+                                _buttonPressed = false;
+                              },
+                            ),
+                            SizedBox(
+                              width: 18,
+                            ),
+                            Container(
+                              height: 35,
+                              width: 90,
+                              padding: EdgeInsets.only(bottom: 3),
+                              decoration: BoxDecoration(
+                                  color: cBackColor4,
+                                  borderRadius: BorderRadius.circular(18)),
+                              child: Center(
+                                child: TextField(
+                                  controller: countController,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  readOnly: false,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                  ),
+                                  style: TextStyle(
+                                      color: cWhiteColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 17),
+                                  onChanged: (value) {
+                                    try {
+                                      count = double.parse(value);
+                                      setState(() {});
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 18,
+                            ),
+                            Listener(
+                              child:
+                                  SvgPicture.asset('assets/icons/plus_oq.svg', height: 45, width: 45,),
+                              onPointerDown: (details) {
+                                _buttonPressed = true;
+                                _increaseCounterWhilePressed();
+                              },
+                              onPointerUp: (details) {
+                                _buttonPressed = false;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 7,
+                    ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 120,
-              ),
-              Text(
-                's',
-                style: TextStyle(color: cWhiteColor),
-              )
             ],
           ),
         ),
       ),
-      floatingActionButton: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        margin: EdgeInsets.only(left: 30),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: cFirstColor,
-        ),
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: Row(
-                children: [
-                  Listener(
-                    child: SvgPicture.asset('assets/icons/minus_oq.svg'),
-                    onPointerDown: (details) {
-                      _buttonPressed = true;
-                      _decreaseCounterWhilePressed();
-                    },
-                    onPointerUp: (details) {
-                      _buttonPressed = false;
-                    },
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Container(
-                    height: 35,
-                    width: 90,
-                    padding: EdgeInsets.only(bottom: 3),
-                    decoration: BoxDecoration(
-                        color: cBackColor4,
-                        borderRadius: BorderRadius.circular(18)),
-                    child: Center(
-                      child: TextField(
-                        controller: countController,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        textAlignVertical: TextAlignVertical.center,
-                        readOnly: false,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                        ),
-                        style: TextStyle(
-                            color: cWhiteColor,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 17),
-                        onChanged: (value) {
-                          try {
-                            count = double.parse(value);
-                            // if (double.parse(widget.tovarList.qoldiq!) >
-                            //     double.parse(value)) {
-                            //
-                            // } else {
-                            //   _showToast(
-                            //     context,
-                            //     "Махсулот қолдиғи етарли эмас",
-                            //   );
-                            //   countController.text =
-                            //       widget.tovarList.qoldiq.toString();
-                            //   count = double.parse(
-                            //       widget.tovarList.qoldiq.toString());
-                            // }
-                            setState(() {});
-                          } catch (e) {
-                            print(e);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Listener(
-                    child: SvgPicture.asset('assets/icons/plus_oq.svg'),
-                    onPointerDown: (details) {
-                      _buttonPressed = true;
-                      _increaseCounterWhilePressed();
-                    },
-                    onPointerUp: (details) {
-                      _buttonPressed = false;
-                    },
-                  ),
-                ],
+      floatingActionButton: InkWell(
+        onTap: () {
+          // if(count>0){
+          if (norma > 0) {
+            if (norma >= num.tryParse(countController.text)!) {
+              onSaveToCart();
+            } else {
+              _showToast(context,
+                  "Махсулотни $norma тадан ортиқ сотиб олиб бўлмайди!");
+            }
+          } else {
+            onSaveToCart();
+          }
+          // }
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          margin: EdgeInsets.only(left: 30),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: cFirstColor,
+          ),
+          height: 50,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Қўшиш',
+                style: TextStyle(
+                    color: cWhiteColor,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500),
               ),
-            ),
-            InkWell(
-              onTap: onSaveToCart,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    color: cBackColor4,
-                    borderRadius: BorderRadius.circular(10)),
-                child: Row(
-                  children: [
-                    Text(
-                      'Қўшиш',
-                      style: TextStyle(
-                          color: cWhiteColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    SizedBox(
-                      width: 6,
-                    ),
-                    SvgPicture.asset(
-                      'assets/icons/history_icon.svg',
-                      width: 20,
-                      height: 20,
-                      color: cWhiteColor,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -338,9 +419,9 @@ class _ProductInfoState extends State<ProductInfo> {
       nalichNarxi: widget.tovarList.nalichNarxi!,
       perechNarxi: widget.tovarList.perechNarxi!,
       optomNarxi: widget.tovarList.perechNarxi!,
-      qoldiq: widget.tovarList.qoldiq!,
+      qoldiq: norma.toString(),
       rasmi: widget.tovarList.rasmi!,
-      miqdorBlok: "1",
+      miqdorBlok: countControllerBloc.text,
       miqdorSoni: countController.text,
       userId: "1",
     );
@@ -352,19 +433,30 @@ class _ProductInfoState extends State<ProductInfo> {
     if (_loopActive) return;
     _loopActive = true;
     while (_buttonPressed) {
-      // if (double.tryParse(widget.tovarList.qoldiq!)! > count) {
       setState(() {
         count++;
         countController.text = count.toString();
       });
-      // } else {
-      //   _showToast(context, "Махсулот қолдиғи етарли эмас");
-      //   _buttonPressed = false;
-      // }
-
       await Future.delayed(Duration(milliseconds: 200));
     }
     _loopActive = false;
+  }
+
+  void _increaseCounterWhilePressedBloc() async {
+    if (_loopActiveBloc) return;
+    _loopActiveBloc = true;
+    while (_buttonPressedBloc) {
+      setState(() {
+        countBloc++;
+        countControllerBloc.text = countBloc.toString();
+        countController.text =
+            (countBloc * double.tryParse(widget.tovarList.blokSoni!)!)
+                .toString();
+        count = countBloc * double.tryParse(widget.tovarList.blokSoni!)!;
+      });
+      await Future.delayed(Duration(milliseconds: 200));
+    }
+    _loopActiveBloc = false;
   }
 
   void _decreaseCounterWhilePressed() async {
@@ -380,6 +472,25 @@ class _ProductInfoState extends State<ProductInfo> {
       await Future.delayed(Duration(milliseconds: 200));
     }
     _loopActive = false;
+  }
+
+  void _decreaseCounterWhilePressedBloc() async {
+    if (_loopActiveBloc) return;
+    _loopActiveBloc = true;
+    while (_buttonPressedBloc) {
+      if (countBloc > 0) {
+        setState(() {
+          countBloc--;
+          countControllerBloc.text = countBloc.toString();
+          countController.text =
+              (countBloc * double.tryParse(widget.tovarList.blokSoni!)!)
+                  .toString();
+          count = countBloc * double.tryParse(widget.tovarList.blokSoni!)!;
+        });
+      }
+      await Future.delayed(Duration(milliseconds: 200));
+    }
+    _loopActiveBloc = false;
   }
 
   void _showToast(BuildContext context, String text) {

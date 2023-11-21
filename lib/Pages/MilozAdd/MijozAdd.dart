@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
-import 'package:zilol_ays_tea/Pages/Login/LoginPage.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,11 +13,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../Canstants/Texts.dart';
 import '../Dialogs/SelectDialogRegion.dart';
-import '../MainPages/MainPage/MainPage.dart';
 
 class ClientAdd extends StatefulWidget {
   @override
@@ -45,7 +41,6 @@ class _ClientAddState extends State<ClientAdd> {
   late double latitude;
   late double longitude;
 
-  // late Position position;
   String regionName = "Ҳудудни танланг";
   String regionId = "";
   Position? position;
@@ -117,7 +112,7 @@ class _ClientAddState extends State<ClientAdd> {
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Container(
-          padding: EdgeInsets.all(30),
+          padding: EdgeInsets.all(16),
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           color: cBackColor,
@@ -125,7 +120,7 @@ class _ClientAddState extends State<ClientAdd> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(
-                    left: 15, right: 0, top: 10, bottom: 12),
+                    left: 0, right: 0, top: 30, bottom: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -147,15 +142,12 @@ class _ClientAddState extends State<ClientAdd> {
                           fontSize: 22),
                     ),
                     SizedBox(
-                      width: 60,
+                      width: 30,
                     ),
                   ],
                 ),
               ),
               Spacer(),
-              SizedBox(
-                height: 10,
-              ),
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -198,7 +190,7 @@ class _ClientAddState extends State<ClientAdd> {
                 ],
               ),
               SizedBox(
-                height: 25,
+                height: 15,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -224,7 +216,7 @@ class _ClientAddState extends State<ClientAdd> {
                 ),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -268,7 +260,7 @@ class _ClientAddState extends State<ClientAdd> {
                 ),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -319,6 +311,7 @@ class _ClientAddState extends State<ClientAdd> {
                   ),
                 ),
               ),
+
               Container(
                 margin: EdgeInsets.only(left: 12),
                 child: loadingINNAvialble
@@ -329,7 +322,7 @@ class _ClientAddState extends State<ClientAdd> {
                     : SizedBox(),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               InkWell(
                 onTap: () {
@@ -370,7 +363,7 @@ class _ClientAddState extends State<ClientAdd> {
                 ),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -412,7 +405,7 @@ class _ClientAddState extends State<ClientAdd> {
                 ),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               Container(
                 decoration: BoxDecoration(
@@ -454,7 +447,7 @@ class _ClientAddState extends State<ClientAdd> {
                 ),
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               MaterialButton(
                 onPressed: () {
@@ -496,40 +489,6 @@ class _ClientAddState extends State<ClientAdd> {
                 /// --------------------------------------
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Сиз алла қачон рўйхатдан ўтганмисиз ?",
-                    style: TextStyle(
-                      color: cSecondColor,
-                      fontSize: 11,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => LoginPage(),
-                        ),
-                      );
-                    },
-                    child: Text("Тизимга кириш",
-                        style: TextStyle(
-                          color: cFirstColor,
-                          fontSize: 11,
-                          decoration: TextDecoration.underline,
-                        )),
-                  ),
-                ],
               ),
               Spacer(),
             ],

@@ -9,6 +9,8 @@ class TovarModel {
   String? optomNarxi;
   String? artikul;
   String? blokSoni;
+  String? bloklandi;
+  String? norma;
   String? qoldiq;
 
   TovarModel(
@@ -22,6 +24,8 @@ class TovarModel {
         this.optomNarxi,
         this.artikul,
         this.blokSoni,
+        this.bloklandi,
+        this.norma,
         this.qoldiq});
 
   TovarModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,8 @@ class TovarModel {
     optomNarxi = json['optom_narxi'];
     artikul = json['artikul'];
     blokSoni = json['blok_soni'];
+    bloklandi = json['bloklandi']??"0";
+    norma = json['norma']??"0";
     qoldiq = json['qoldiq'];
   }
 
@@ -50,6 +56,8 @@ class TovarModel {
     data['optom_narxi'] = this.optomNarxi;
     data['artikul'] = this.artikul;
     data['blok_soni'] = this.blokSoni;
+    data['bloklandi'] = this.bloklandi;
+    data['norma'] = this.norma;
     data['qoldiq'] = this.qoldiq;
     return data;
   }

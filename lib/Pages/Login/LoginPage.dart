@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
     if (response.statusCode == 200) {
       final params = jsonDecode(response.data);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.reload();
+
       if (checkedValue) {
         if (params["success"]) {
           await prefs.setString('mijoz_id', params["mijoz_id"].toString());

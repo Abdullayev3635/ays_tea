@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:photo_view/photo_view.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/LocalStorage/Db_Halper.dart';
 import 'package:zilol_ays_tea/Pages/Login/LoginPage.dart';
@@ -99,62 +100,51 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 height: 50,
               ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: 120,
-                    width: 120,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      child: SizedBox(
-                        width: 120,
-                        height: 120,
-                        child: ClipOval(
-                          child: this.image == null
-                              ? CachedNetworkImage(
-                                  imageUrl: baseUrl +
-                                      imgClient +
-                                      userId +
-                                      "^" +
-                                      turi +
-                                      ".png",
-                                  placeholder: (context, url) => Container(
-                                    margin: EdgeInsets.all(20),
-                                    child: SvgPicture.asset(
-                                      'assets/icons/placeholder.svg',
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Image.asset(
-                                    "assets/images/person_png.png",
-                                    height: 120,
-                                    width: 120,
-                                  ),
-                                  fit: BoxFit.fill,
-                                )
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: Image.file(
-                                    this.image!,
-                                    fit: BoxFit.fill,
+              Container(
+                height: 120,
+                width: 120,
+                child: CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  child: InkResponse(
+                    onTap: () {
+                      _showSecondPage(
+                        context,
+                        baseUrl + imgClient + userId + ".png",
+                        baseUrl + imgClient + userId + ".png",
+                      );
+                    },
+                    child: SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: ClipOval(
+                        child: this.image == null
+                            ? CachedNetworkImage(
+                                imageUrl: baseUrl + imgClient + userId + ".png",
+                                placeholder: (context, url) => Container(
+                                  margin: EdgeInsets.all(20),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/placeholder.svg',
                                   ),
                                 ),
-                        ),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                  "assets/images/person_png.png",
+                                  height: 120,
+                                  width: 120,
+                                ),
+                                fit: BoxFit.fill,
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image.file(
+                                  this.image!,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
                       ),
                     ),
                   ),
-                  Positioned(
-                    child: InkWell(
-                      onTap: () {
-                        pickImage();
-                      },
-                      child: SvgPicture.asset("assets/icons/plus.svg"),
-                    ),
-                    bottom: 2,
-                    right: 2,
-                  ),
-                ],
+                ),
               ),
               SizedBox(
                 height: 40,
@@ -295,17 +285,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future pickImage() async {
-    try {
-      final image = await ImagePicker()
-          .pickImage(source: ImageSource.camera, maxHeight: 512, maxWidth: 512);
-      if (image == null) return;
-      final imageTemp = File(image.path);
-      saveImage();
-      setState(() => this.image = imageTemp);
-    } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
-    }
+  void _showSecondPage(BuildContext context, String imgUrl, String hero) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => Scaffold(
+          body: Center(
+            child: Hero(
+              tag: hero,
+              child: PhotoView(
+                imageProvider: CachedNetworkImageProvider(imgUrl),
+                minScale: PhotoViewComputedScale.contained * 1,
+                maxScale: PhotoViewComputedScale.covered * 5,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void logUOut() async {
@@ -330,28 +326,5 @@ class _ProfilePageState extends State<ProfilePage> {
       userId = prefs.getString("agent_id") ?? "0";
     }
     setState(() {});
-  }
-
-  void saveImage() async {
-    if (image != null) {
-      List<int> imageBytes = image!.readAsBytesSync();
-      String base64Image = base64Encode(imageBytes);
-      final Dio dio = Dio();
-      var formData = FormData.fromMap({
-        "id": userId + "^" + "1",
-        "rasm": base64Image,
-      });
-      final response = await dio.post(
-        baseUrl + "in_mijoz_rasm.php",
-        data: formData,
-        options: Options(
-          receiveTimeout: 30000,
-          sendTimeout: 30000,
-        ),
-      );
-      if (response.statusCode == 200) {
-        print("success");
-      }
-    }
   }
 }

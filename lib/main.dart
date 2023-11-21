@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:battery/battery.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'Canstants/Texts.dart';
 import 'Pages/Splash/Splash.dart';
 

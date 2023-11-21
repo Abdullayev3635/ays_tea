@@ -2,6 +2,7 @@ import 'package:zilol_ays_tea/Canstants/Texts.dart';
 import 'package:zilol_ays_tea/Canstants/color_const.dart';
 import 'package:zilol_ays_tea/LocalStorage/Db_Halper.dart';
 import 'package:zilol_ays_tea/Models/BrendModel.dart';
+import 'package:zilol_ays_tea/Pages/Buyurtma/Cart/CartPage.dart';
 import 'package:zilol_ays_tea/Pages/Buyurtma/Products/Product.dart';
 import 'package:zilol_ays_tea/Pages/Dialogs/BlockDialog.dart';
 import 'package:zilol_ays_tea/Pages/Dialogs/NotInternetDialog.dart';
@@ -12,6 +13,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Cart/CartPage2.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -99,7 +102,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
     _loadCount();
-    checkState();
+
     super.initState();
   }
 
@@ -210,23 +213,34 @@ class _HomePageState extends State<HomePage> {
                               ),
                               style:
                                   TextStyle(fontSize: 16, color: cFirstColor),
+                              textAlign: TextAlign.justify,
                             ),
                             width: MediaQuery.of(context).size.width - 100,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(2.0, 0, 2.0, 0),
-                          child: (countZak ?? 0) > 0
-                              ? SvgPicture.asset(
-                                  'assets/icons/cart_addition.svg',
-                                  width: 24,
-                                  height: 24,
-                                )
-                              : SvgPicture.asset(
-                                  'assets/icons/cart_none.svg',
-                                  width: 24,
-                                  height: 24,
-                                ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => CartPage2(),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(2.0, 0, 2.0, 0),
+                            child: (countZak ?? 0) > 0
+                                ? SvgPicture.asset(
+                                    'assets/icons/cart_addition.svg',
+                                    width: 24,
+                                    height: 24,
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/icons/cart_none.svg',
+                                    width: 24,
+                                    height: 24,
+                                  ),
+                          ),
                         ),
                         SizedBox(
                           width: 10,
@@ -237,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            collapsedHeight: MediaQuery.of(context).size.height / 10,
+            collapsedHeight: MediaQuery.of(context).size.height / 8,
             expandedHeight: 0,
           ),
           loadingBrend
@@ -275,44 +289,33 @@ class _HomePageState extends State<HomePage> {
                                         ).then((value) => {load()});
                                       },
                                       child: Container(
-                                        width: 250,
-                                        height: 250,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(17.0),
-                                                topRight:
-                                                    Radius.circular(17.0))),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(17.0),
-                                              topRight: Radius.circular(17.0)),
-                                          // child: Container(
-                                          //   margin: EdgeInsets.all(35),
-                                          //   child: SvgPicture.asset(
-                                          //     'assets/icons/placeholder.svg',
-                                          //   ),
-                                          // ),
-                                          child: CachedNetworkImage(
-                                            imageUrl: baseUrl + imgBrand +
-                                                brendList[index].id +
-                                                ".png",
-                                            placeholder: (context, url) =>
-                                                Container(
-                                              margin: EdgeInsets.all(20),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/placeholder.svg',
-                                              ),
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                2.3,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        color: Colors.transparent,
+                                        child: CachedNetworkImage(
+                                          imageUrl: baseUrl +
+                                              imgBrand +
+                                              brendList[index].img,
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            margin: EdgeInsets.all(36),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/placeholder.svg',
+                                              color: cFirstColor,
                                             ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Container(
-                                              margin: EdgeInsets.all(20),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/placeholder.svg',
-                                              ),
-                                            ),
-                                            fit: BoxFit.fill,
                                           ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            margin: EdgeInsets.all(36),
+                                            child: SvgPicture.asset(
+                                              'assets/icons/placeholder.svg',
+                                              color: cFirstColor,
+                                            ),
+                                          ),
+                                          fit: BoxFit.fitHeight,
                                         ),
                                       ),
                                     ),
