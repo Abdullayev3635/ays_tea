@@ -321,7 +321,7 @@ class _XisobotMijozDialogAylanmaState extends State<XisobotMijozDialogAylanma> {
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: cFirstColor,
-            accentColor: cSecondColor,
+            hintColor: cSecondColor,
             colorScheme: ColorScheme.light(primary: cFirstColor),
             buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),

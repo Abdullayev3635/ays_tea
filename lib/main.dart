@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:battery/battery.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
 import 'Canstants/Texts.dart';
 import 'Pages/Splash/Splash.dart';
 
@@ -31,13 +30,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 // void isolate1(String arg) async {
 //
 //   lat = position.latitude.toString();
 //   lng = position.longitude.toString();
 // }
-
 
 void onStart() async {
   // WidgetsFlutterBinding.ensureInitialized();

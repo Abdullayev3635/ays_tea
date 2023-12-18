@@ -241,7 +241,7 @@ class _XisobotMijozDialogQarzdorlikState extends State<XisobotMijozDialogQarzdor
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: cFirstColor,
-            accentColor: cSecondColor,
+            hintColor: cSecondColor,
             colorScheme: ColorScheme.light(primary: cFirstColor),
             buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),
